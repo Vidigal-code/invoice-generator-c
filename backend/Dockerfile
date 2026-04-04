@@ -1,9 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-COPY backend/InvoiceGenerator.Api.csproj backend/
-RUN dotnet restore backend/InvoiceGenerator.Api.csproj
-COPY backend/ backend/
-RUN dotnet publish backend/InvoiceGenerator.Api.csproj -c Release -o /app/publish /p:UseAppHost=false
+COPY InvoiceGenerator.Api.csproj ./
+RUN dotnet restore InvoiceGenerator.Api.csproj
+COPY . ./
+RUN dotnet publish InvoiceGenerator.Api.csproj -c Release -o /app/publish /p:UseAppHost=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
