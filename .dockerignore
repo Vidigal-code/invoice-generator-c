@@ -3,4 +3,6 @@
 **/.vs/
 **/.git/
 **/.env
+**/node_modules/
+**/dist/
 *.user

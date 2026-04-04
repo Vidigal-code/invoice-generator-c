@@ -1,0 +1,26 @@
+<main class="shell">
+  <header>
+    <h1>{{ title }}</h1>
+    <p class="meta">API: <code>{{ apiUrl }}</code></p>
+  </header>
+
+  <section class="card">
+    <h2>Weather (API)</h2>
+    @if (error) {
+      <p class="error">{{ error }}</p>
+    } @else if (forecasts === null) {
+      <p>A carregar…</p>
+    } @else {
+      <ul>
+        @for (f of forecasts; track f.date) {
+          <li>
+            <strong>{{ f.date }}</strong> — {{ f.temperatureC }}°C /
+            {{ f.temperatureF }}°F — {{ f.summary }}
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <router-outlet />
+</main>
