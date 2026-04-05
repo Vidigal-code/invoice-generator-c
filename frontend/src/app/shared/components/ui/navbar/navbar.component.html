@@ -1,0 +1,46 @@
+<nav class="navbar" role="navigation" aria-label="Navegação principal">
+
+    <a class="logo" [routerLink]="isAuthenticated ? '/dashboard' : '/'" aria-label="Início">
+        <mat-icon aria-hidden="true">receipt_long</mat-icon>
+        <span class="logo-text">invoice-generator-c</span>
+    </a>
+
+    <div class="nav-links" role="list">
+        <ng-container *ngIf="isAuthenticated">
+            <a mat-button routerLink="/dashboard" class="nav-link" role="listitem">
+                <mat-icon>dashboard</mat-icon> Dashboard
+            </a>
+        </ng-container>
+        <ng-container *ngIf="!isAuthenticated">
+            <a mat-button routerLink="/login" class="nav-link" role="listitem">Entrar</a>
+            <a mat-raised-button color="primary" routerLink="/register" class="nav-link" role="listitem">Criar Conta</a>
+        </ng-container>
+
+        <button mat-icon-button class="icon-btn" (click)="toggleTheme()"
+            [attr.aria-label]="isDarkMode ? 'Mudar para modo claro' : 'Mudar para modo escuro'">
+            <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        </button>
+
+        <button mat-icon-button class="icon-btn hamburger" (click)="toggleMenu()"
+            [attr.aria-label]="menuOpen ? 'Fechar menu' : 'Abrir menu'" [attr.aria-expanded]="menuOpen">
+            <mat-icon>{{ menuOpen ? 'close' : 'menu' }}</mat-icon>
+        </button>
+    </div>
+
+</nav>
+
+<div class="mobile-menu" [class.open]="menuOpen" role="menu">
+    <ng-container *ngIf="isAuthenticated">
+        <a mat-button class="menu-item" routerLink="/dashboard" role="menuitem" (click)="closeMenu()">
+            <mat-icon>dashboard</mat-icon> Dashboard
+        </a>
+    </ng-container>
+    <ng-container *ngIf="!isAuthenticated">
+        <a mat-button class="menu-item" routerLink="/login" role="menuitem" (click)="closeMenu()">
+            <mat-icon>login</mat-icon> Entrar
+        </a>
+        <a mat-button class="menu-item" routerLink="/register" role="menuitem" (click)="closeMenu()">
+            <mat-icon>person_add</mat-icon> Criar Conta
+        </a>
+    </ng-container>
+</div>

@@ -1,0 +1,33 @@
+<h2 mat-dialog-title>Editar Contrato</h2>
+<mat-dialog-content>
+  <form [formGroup]="data.form" class="edit-form">
+    <mat-form-field appearance="outline"><mat-label>Número</mat-label><input matInput formControlName="contractNumber"></mat-form-field>
+    <mat-form-field appearance="outline"><mat-label>Devedor</mat-label><input matInput formControlName="debtorName"></mat-form-field>
+    <mat-form-field appearance="outline"><mat-label>Documento</mat-label><input matInput formControlName="debtorDocument"></mat-form-field>
+    <mat-form-field appearance="outline"><mat-label>Valor Original</mat-label><input matInput type="number" formControlName="originalValue"></mat-form-field>
+    <mat-form-field appearance="outline"><mat-label>Saldo Atual</mat-label><input matInput type="number" formControlName="currentBalance"></mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Carteira</mat-label>
+      <mat-select formControlName="portfolio">
+        <mat-option *ngFor="let p of data.portfolios" [value]="p.value">{{ p.label }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        <mat-option *ngFor="let s of data.statuses" [value]="s.value">{{ s.label }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Utilizador (dívida no dashboard)</mat-label>
+      <mat-select formControlName="ownerUserId">
+        <mat-option [value]="null">Nenhum (só admin)</mat-option>
+        <mat-option *ngFor="let u of data.users" [value]="u.id">{{ u.username }} — {{ u.email }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="ref.close(false)">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="ref.close(true)" [disabled]="data.form.invalid">Salvar</button>
+</mat-dialog-actions>

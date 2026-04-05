@@ -1,0 +1,248 @@
+<div class="dashboard-wrapper stack-page">
+    <div class="dashboard-content max-readable-width">
+
+        <div class="page-header">
+            <div class="page-header-text">
+                <h1 class="page-title">
+                    <mat-icon class="title-icon">account_balance</mat-icon>
+                    invoice-generator-c
+                </h1>
+                <p class="page-subtitle">Cálculo de dívida, acordos e boletos — canais digitais de cobrança</p>
+            </div>
+        </div>
+
+        <mat-card class="section-card">
+            <mat-card-header class="card-header-row">
+                <div>
+                    <mat-card-title>
+                        <mat-icon class="section-icon">description</mat-icon>
+                        Contratos Ativos
+                    </mat-card-title>
+                    <mat-card-subtitle>Contratos da carteira — calcule a dívida e formalize acordos</mat-card-subtitle>
+                </div>
+                <button mat-icon-button (click)="loadData()" matTooltip="Atualizar lista">
+                    <mat-icon>refresh</mat-icon>
+                </button>
+            </mat-card-header>
+            <mat-card-content>
+                <div *ngIf="loadingContracts" class="loading-state">
+                    <mat-spinner diameter="36"></mat-spinner>
+                    <span>Carregando contratos...</span>
+                </div>
+                <div *ngIf="!loadingContracts && contractsList.length === 0" class="empty-state">
+                    <mat-icon>inbox</mat-icon>
+                    <p>Nenhum contrato encontrado no sistema.</p>
+                </div>
+                <div class="table-container" *ngIf="!loadingContracts && contractsList.length > 0">
+                    <table mat-table [dataSource]="contractsList" class="full-table">
+                        <ng-container matColumnDef="contractNumber">
+                            <th mat-header-cell *matHeaderCellDef>Número</th>
+                            <td mat-cell *matCellDef="let row"><span class="contract-number">{{ row.contractNumber
+                                    }}</span></td>
+                        </ng-container>
+                        <ng-container matColumnDef="portfolio">
+                            <th mat-header-cell *matHeaderCellDef>Carteira</th>
+                            <td mat-cell *matCellDef="let row"><span class="portfolio-chip">{{ row.portfolio | portfolioLabel }}</span></td>
+                        </ng-container>
+                        <ng-container matColumnDef="debtorName">
+                            <th mat-header-cell *matHeaderCellDef>Devedor</th>
+                            <td mat-cell *matCellDef="let row">{{ row.debtorName }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="status">
+                            <th mat-header-cell *matHeaderCellDef>Status</th>
+                            <td mat-cell *matCellDef="let row">
+                                <span class="status-badge" [class.status-active]="row.status === 'Active'"
+                                    [class.status-negotiated]="row.status === 'Negotiated'">
+                                    {{ row.status === 'Active' ? 'Ativo' : row.status === 'Negotiated' ? 'Negociado' :
+                                    row.status }}
+                                </span>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="action">
+                            <th mat-header-cell *matHeaderCellDef>Ação</th>
+                            <td mat-cell *matCellDef="let row">
+                                <button mat-flat-button color="primary" class="calc-btn" (click)="simulate(row.id)"
+                                    [disabled]="loadingCalc">
+                                    <mat-icon>calculate</mat-icon>
+                                    Calcular Dívida
+                                </button>
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="contractColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: contractColumns;"
+                            [class.selected-row]="appState.debtCalculationResult()?.contractId === row.id"></tr>
+                    </table>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card class="section-card result-card" *ngIf="appState.debtCalculationResult()">
+            <mat-card-header>
+                <mat-card-title>
+                    <mat-icon class="section-icon">receipt_long</mat-icon>
+                    Resultado do Cálculo
+                </mat-card-title>
+                <mat-card-subtitle>Contrato: {{ appState.debtCalculationResult()?.contractNumber }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="result-grid">
+                    <div class="result-metric">
+                        <span class="metric-label">Valor Original das Parcelas</span>
+                        <span class="metric-value">R$ {{ appState.debtCalculationResult()?.originalTotalDebt |
+                            number:'1.2-2' }}</span>
+                    </div>
+                    <div class="result-metric highlight">
+                        <span class="metric-label">Total Atualizado (com juros)</span>
+                        <span class="metric-value accent">R$ {{ appState.debtCalculationResult()?.currentTotalDebt |
+                            number:'1.2-2' }}</span>
+                    </div>
+                    <div class="result-metric">
+                        <span class="metric-label">Parcelas em Aberto</span>
+                        <span class="metric-value">{{ appState.debtCalculationResult()?.openInstallments?.length || 0
+                            }}</span>
+                    </div>
+                </div>
+
+                <mat-divider style="margin: 16px 0;"></mat-divider>
+                <p class="section-sub-label">Detalhamento das Parcelas em Aberto</p>
+                <div class="table-container" *ngIf="appState.debtCalculationResult()?.openInstallments?.length">
+                    <table mat-table [dataSource]="appState.debtCalculationResult()!.openInstallments!"
+                        class="full-table installments-table">
+                        <ng-container matColumnDef="number">
+                            <th mat-header-cell *matHeaderCellDef>#</th>
+                            <td mat-cell *matCellDef="let i">{{ i.installmentNumber }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="due">
+                            <th mat-header-cell *matHeaderCellDef>Vencimento</th>
+                            <td mat-cell *matCellDef="let i">{{ i.dueDate | date:'dd/MM/yyyy' }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="original">
+                            <th mat-header-cell *matHeaderCellDef>Valor Original</th>
+                            <td mat-cell *matCellDef="let i">R$ {{ i.originalValue | number:'1.2-2' }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="current">
+                            <th mat-header-cell *matHeaderCellDef>Valor Atualizado</th>
+                            <td mat-cell *matCellDef="let i"><strong>R$ {{ i.currentValue | number:'1.2-2' }}</strong>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="overdue">
+                            <th mat-header-cell *matHeaderCellDef>Dias Vencidos</th>
+                            <td mat-cell *matCellDef="let i">
+                                <span [class.overdue-red]="i.daysOverdue > 0">{{ i.daysOverdue }} dias</span>
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="installmentColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: installmentColumns;"></tr>
+                    </table>
+                </div>
+
+                <mat-divider style="margin: 24px 0;"></mat-divider>
+                <div class="formalize-form">
+                    <p class="section-sub-label">Formalizar Acordo de Pagamento</p>
+                    <div class="formalize-row">
+                        <mat-form-field appearance="outline" class="installment-field">
+                            <mat-label>Número de Parcelas</mat-label>
+                            <mat-select [(ngModel)]="selectedInstallments">
+                                <mat-option *ngFor="let n of installmentOptions" [value]="n">
+                                    {{ n }}x de R$ {{ (appState.debtCalculationResult()?.currentTotalDebt! / n) |
+                                    number:'1.2-2' }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <button mat-flat-button color="accent" class="formalize-btn"
+                            (click)="formalizeAgreement(appState.debtCalculationResult()?.contractId)"
+                            [disabled]="loadingFormalize">
+                            <span class="formalize-btn-inner" *ngIf="!loadingFormalize">
+                                <mat-icon>handshake</mat-icon>
+                                <span>Formalizar Acordo</span>
+                            </span>
+                            <span class="formalize-btn-loading" *ngIf="loadingFormalize">
+                                <mat-spinner diameter="24"></mat-spinner>
+                                <span class="formalize-loading-label">Formalizando...</span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card class="section-card">
+            <mat-card-header class="card-header-row">
+                <div>
+                    <mat-card-title>
+                        <mat-icon class="section-icon">history</mat-icon>
+                        Histórico de Acordos Formalizados
+                    </mat-card-title>
+                    <mat-card-subtitle>Acompanhe todos os acordos já processados no sistema (atualiza ao refletir alterações de contrato feitas pelo administrador)</mat-card-subtitle>
+                </div>
+                <button mat-icon-button (click)="loadHistory()" matTooltip="Atualizar histórico">
+                    <mat-icon>refresh</mat-icon>
+                </button>
+            </mat-card-header>
+            <mat-card-content>
+                <div *ngIf="loadingHistory" class="loading-state">
+                    <mat-spinner diameter="36"></mat-spinner>
+                    <span>Carregando histórico...</span>
+                </div>
+                <div *ngIf="!loadingHistory && historyList.length === 0" class="empty-state">
+                    <mat-icon>history_toggle_off</mat-icon>
+                    <p>Nenhum acordo formalizado ainda.</p>
+                </div>
+                <div class="table-container" *ngIf="!loadingHistory && historyList.length > 0">
+                    <table mat-table [dataSource]="historyList" class="full-table">
+                        <ng-container matColumnDef="contract">
+                            <th mat-header-cell *matHeaderCellDef>Contrato</th>
+                            <td mat-cell *matCellDef="let row"><span class="contract-number">{{ row.contractNumber
+                                    }}</span></td>
+                        </ng-container>
+                        <ng-container matColumnDef="contractStatus">
+                            <th mat-header-cell *matHeaderCellDef>Estado do contrato</th>
+                            <td mat-cell *matCellDef="let row">{{ contractStatusLabel(row.contractStatus) }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="value">
+                            <th mat-header-cell *matHeaderCellDef>Total Negociado</th>
+                            <td mat-cell *matCellDef="let row"><strong>R$ {{ row.totalValue | number:'1.2-2' }}</strong>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="installments">
+                            <th mat-header-cell *matHeaderCellDef>Parcelas</th>
+                            <td mat-cell *matCellDef="let row">{{ row.installments }}x</td>
+                        </ng-container>
+                        <ng-container matColumnDef="date">
+                            <th mat-header-cell *matHeaderCellDef>Data</th>
+                            <td mat-cell *matCellDef="let row">{{ row.date | date:'dd/MM/yyyy HH:mm' }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="status">
+                            <th mat-header-cell *matHeaderCellDef>Situação do acordo</th>
+                            <td mat-cell *matCellDef="let row">
+                                <span class="status-badge" [class.status-active]="row.status === 'Active'"
+                                    [class.status-negotiated]="row.status === 'Pending'"
+                                    [class.status-defaulted]="row.status === 'Broken'">{{ agreementHistoryLabel(row) }}</span>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="action">
+                            <th mat-header-cell *matHeaderCellDef>Boleto</th>
+                            <td mat-cell *matCellDef="let row">
+                                <button *ngIf="row.billetId" mat-flat-button
+                                    [color]="selectedBilletId === row.billetId ? 'accent' : 'primary'" class="pdf-btn"
+                                    (click)="toggleBilletViewer(row.billetId)"
+                                    matTooltip="{{selectedBilletId === row.billetId ? 'Fechar boleto' : 'Visualizar boleto'}}">
+                                    <mat-icon>{{ selectedBilletId === row.billetId ? 'expand_less' : 'receipt_long'
+                                        }}</mat-icon>
+                                    {{ selectedBilletId === row.billetId ? 'Fechar' : 'Ver Boleto' }}
+                                </button>
+                                <span *ngIf="!row.billetId" class="no-billet">&mdash;</span>
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="historyColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: historyColumns;"></tr>
+                    </table>
+
+                    <app-billet-viewer *ngIf="selectedBilletId" [billetId]="selectedBilletId">
+                    </app-billet-viewer>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+    </div>
+</div>

@@ -1,0 +1,44 @@
+<div class="viewer-wrapper">
+
+    <div *ngIf="loading" class="viewer-loading">
+        <mat-spinner diameter="36"></mat-spinner>
+        <p>Carregando boleto...</p>
+    </div>
+
+    <div *ngIf="errorMessage && !loading" class="viewer-error">
+        <mat-icon>error_outline</mat-icon>
+        <p>{{ errorMessage }}</p>
+        <button mat-stroked-button color="warn" (click)="load()">
+            <mat-icon>refresh</mat-icon> Tentar novamente
+        </button>
+    </div>
+
+    <div *ngIf="iframeSrc && !loading" class="viewer-content">
+
+        <div class="viewer-toolbar">
+            <span class="toolbar-title">
+                <mat-icon class="toolbar-icon">receipt_long</mat-icon>
+                Boleto Bancário
+            </span>
+            <div class="toolbar-actions">
+                <button mat-stroked-button (click)="printSlip()" matTooltip="Imprimir boleto">
+                    <mat-icon>print</mat-icon> Imprimir
+                </button>
+                <button mat-stroked-button (click)="downloadSlip()"
+                    [matTooltip]="displayIsPdf ? 'Baixar PDF' : 'Baixar boleto (HTML)'">
+                    <mat-icon>download</mat-icon> {{ displayIsPdf ? 'Baixar PDF' : 'Baixar boleto' }}
+                </button>
+                <button mat-flat-button color="primary" (click)="openInNewTab()" matTooltip="Abrir em nova aba">
+                    <mat-icon>open_in_new</mat-icon> Abrir
+                </button>
+            </div>
+        </div>
+
+        <iframe class="billet-iframe" [src]="iframeSrc" frameborder="0"
+            [attr.sandbox]="iframeSandbox"
+            title="Boleto Bancário">
+        </iframe>
+
+    </div>
+
+</div>

@@ -1,0 +1,68 @@
+.dialog-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    margin: 0;
+    padding: 16px 24px 8px;
+    color: #111;
+}
+
+.prompt-icon {
+    color: #2b70c9;
+    font-size: 32px;
+}
+
+.error-icon {
+    color: #e53935 !important;
+}
+
+.success-icon {
+    color: #43a047 !important;
+}
+
+.dialog-content {
+    padding: 8px 24px 16px;
+
+    p {
+        font-size: 15px;
+        line-height: 1.6;
+        margin: 0;
+        color: #111;
+    }
+}
+
+.dialog-actions {
+    padding: 8px 16px 16px;
+}
+
+:host-context(body.dark-theme) {
+
+    .dialog-title {
+        color: #fff !important;
+    }
+
+    .dialog-content p {
+        color: #fff !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .dialog-title {
+        font-size: 17px;
+        gap: 8px;
+        padding: 12px 16px 6px;
+    }
+
+    .prompt-icon {
+        font-size: 26px;
+    }
+
+    .dialog-content {
+        padding: 6px 16px 12px;
+
+        p {
+            font-size: 14px;
+        }
+    }
+}

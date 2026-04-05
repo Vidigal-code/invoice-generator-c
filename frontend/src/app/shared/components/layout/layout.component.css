@@ -1,0 +1,158 @@
+.sidenav-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidenav-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidenav {
+  width: 260px;
+  background-color: var(--bg-surface);
+  border-right: 1px solid var(--border-color);
+}
+
+.sidenav-header {
+  gap: 10px;
+}
+
+.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  min-height: 56px;
+  flex-shrink: 0;
+  background: #003087 !important;
+  background-color: #003087 !important;
+  color: #fff !important;
+}
+
+
+.page-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: calc(100vh - 56px);
+}
+
+.content-wrapper {
+  flex: 1;
+  padding: 20px;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.app-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  opacity: 0.92;
+  margin-right: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.user-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.role-badge {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
+.desktop-only {
+  display: flex !important;
+}
+
+.mobile-menu-btn {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+
+  .content-wrapper {
+    padding: 10px 8px;
+  }
+
+  .app-title {
+    font-size: 0.95rem;
+  }
+}
+
+:host-context(body.dark-theme) .sidenav {
+  background-color: #1a2035 !important;
+}
+
+:host-context(body.dark-theme) .sidenav .mdc-list-item__primary-text,
+:host-context(body.dark-theme) .sidenav .mat-mdc-list-item-title,
+:host-context(body.dark-theme) .sidenav span,
+:host-context(body.dark-theme) .sidenav a {
+  color: #fff !important;
+}
+
+:host-context(body.dark-theme) .sidenav mat-icon,
+:host-context(body.dark-theme) .sidenav .mat-icon {
+  color: #fff !important;
+}
+
+:host-context(body.dark-theme) .sidenav .mat-mdc-list-item:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+:host-context(body.dark-theme) .sidenav mat-divider {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+:host-context(body.dark-theme) .sidenav-header {
+  background: #003087 !important;
+  color: #fff !important;
+}
+
+:host-context(body.dark-theme) .sidenav-header .mat-toolbar-row,
+:host-context(body.dark-theme) .sidenav-header .mdc-toolbar__row {
+  background: transparent !important;
+}
+
+:host-context(body.dark-theme) .sidenav-header mat-icon,
+:host-context(body.dark-theme) .sidenav-header span {
+  color: #fff !important;
+  background: transparent !important;
+}

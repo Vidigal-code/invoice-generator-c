@@ -1,0 +1,13 @@
+<h2 mat-dialog-title class="dialog-title">
+    <span class="material-icons prompt-icon"
+        [ngClass]="{'error-icon': data.icon === 'error_outline', 'success-icon': data.icon === 'check_circle'}">
+        {{ data.icon || 'info' }}
+    </span>
+    {{ data.title }}
+</h2>
+<mat-dialog-content class="dialog-content">
+    <p>{{ data.message }}</p>
+</mat-dialog-content>
+<mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-raised-button color="primary" (click)="close()">{{ data.confirmLabel || 'OK' }}</button>
+</mat-dialog-actions>

@@ -1,0 +1,20 @@
+.hist-content {
+  max-height: 70vh;
+  overflow: auto;
+}
+
+.hist-table {
+  width: 100%;
+}
+
+.payload-pre {
+  margin: 0;
+  font-size: 11px;
+  white-space: pre-wrap;
+  max-width: 420px;
+}
+
+.empty-hist {
+  color: #64748b;
+  padding: 1rem 0;
+}

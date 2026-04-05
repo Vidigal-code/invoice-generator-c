@@ -1,0 +1,359 @@
+.dashboard-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+    min-height: 100%;
+    box-sizing: border-box;
+    background: transparent;
+    overflow-x: hidden;
+    color: #111;
+}
+
+:host-context(body.dark-theme) .dashboard-wrapper {
+    color: #fff;
+}
+
+:host-context(body.dark-theme) mat-icon,
+:host-context(body.dark-theme) .page-title,
+:host-context(body.dark-theme) .page-subtitle,
+:host-context(body.dark-theme) .section-icon,
+:host-context(body.dark-theme) .title-icon,
+:host-context(body.dark-theme) mat-card-title,
+:host-context(body.dark-theme) mat-card-subtitle,
+:host-context(body.dark-theme) td,
+:host-context(body.dark-theme) th {
+    color: #fff !important;
+}
+
+:host-context(body:not(.dark-theme)) .dashboard-wrapper {
+    color: #111;
+}
+
+
+.dashboard-content {
+    width: 100%;
+    max-width: 1140px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.page-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 16px 0 8px;
+}
+
+.page-header-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.page-title {
+    font-size: 1.7rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #111;
+}
+
+.title-icon {
+    font-size: 2rem;
+    width: 2rem;
+    height: 2rem;
+    color: var(--accent-color);
+}
+
+.page-subtitle {
+    margin: 6px 0 0;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+:host-context(body.dark-theme) .page-title {
+    color: #111 !important;
+}
+
+:host-context(body.dark-theme) .page-subtitle {
+    color: #444 !important;
+}
+
+:host-context(body.dark-theme) .title-icon {
+    color: var(--accent-color) !important;
+}
+
+.section-card {
+    border-radius: 12px !important;
+    background: var(--bg-surface) !important;
+}
+
+.card-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.section-icon {
+    vertical-align: middle;
+    margin-right: 6px;
+    font-size: 1.3rem;
+    width: 1.3rem;
+    height: 1.3rem;
+}
+
+.result-card {
+    border-left: 4px solid var(--accent-color) !important;
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 8px 0 4px;
+}
+
+.result-metric {
+    background: rgba(128, 128, 128, 0.08);
+    border-radius: 8px;
+    padding: 16px;
+
+    &.highlight {
+        background: rgba(66, 165, 245, 0.1);
+        border: 1px solid rgba(66, 165, 245, 0.3);
+    }
+}
+
+.metric-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.metric-value {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+
+    &.accent {
+        color: var(--accent-color);
+    }
+}
+
+.section-sub-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin: 0 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.formalize-form {
+
+    .mat-mdc-form-field {
+        --mdc-theme-primary: var(--accent-color);
+    }
+}
+
+.formalize-row {
+    display: flex;
+    align-items: stretch;
+    gap: 16px;
+    flex-wrap: nowrap;
+    min-height: 56px;
+}
+
+.installment-field {
+    min-width: 220px;
+    flex: 1;
+
+    .mat-mdc-form-field {
+        width: 100%;
+        height: 56px;
+    }
+
+    .mat-mdc-text-field-wrapper {
+        height: 56px;
+        display: flex;
+        align-items: center;
+    }
+}
+
+.formalize-btn {
+    height: 56px;
+    min-height: 56px;
+    padding: 0 28px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-width: 220px;
+    width: 100%;
+    align-self: stretch;
+}
+
+.formalize-btn-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.formalize-btn-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    line-height: 1;
+
+    mat-spinner {
+        margin: 0 auto;
+    }
+
+    ::ng-deep .mat-mdc-progress-spinner,
+    ::ng-deep .mdc-circular-progress {
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+.formalize-loading-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    opacity: 0.95;
+}
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 8px;
+}
+
+.full-table {
+    width: 100%;
+    background: var(--bg-surface) !important;
+}
+
+.installments-table {
+    font-size: 0.875rem;
+}
+
+.status-badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-active {
+    background: rgba(76, 175, 80, 0.18);
+    color: #43a047;
+}
+
+.status-negotiated {
+    background: rgba(66, 165, 245, 0.18);
+    color: #42a5f5;
+}
+
+.status-defaulted {
+    background: rgba(239, 83, 80, 0.15);
+    color: #c62828;
+}
+
+.contract-number {
+    font-family: 'Fira Code', monospace;
+    font-weight: 600;
+}
+
+.selected-row {
+    background: rgba(66, 165, 245, 0.08);
+}
+
+.overdue-red {
+    color: #ef5350;
+    font-weight: 600;
+}
+
+.no-billet {
+    opacity: 0.35;
+    color: var(--text-secondary);
+}
+
+.loading-state {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 24px;
+    color: var(--text-secondary);
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px;
+    color: var(--text-secondary);
+    gap: 8px;
+
+    mat-icon {
+        font-size: 3rem;
+        width: 3rem;
+        height: 3rem;
+    }
+}
+
+
+.full-table td button.action-btn,
+.calc-btn,
+.pdf-btn {
+    width: 100%;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .dashboard-wrapper {
+        padding: 12px 8px;
+        overflow-x: auto;
+    }
+
+    .dashboard-content {
+        min-width: 0;
+        overflow-x: auto;
+    }
+
+    .result-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .formalize-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .formalize-btn,
+    .installment-field {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .page-title {
+        font-size: 1.25rem;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: 60vh;
+        -webkit-overflow-scrolling: touch;
+    }
+}

@@ -1,0 +1,47 @@
+<div class="auth-wrapper">
+    <app-navbar></app-navbar>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2>Registro de Usuário</h2>
+            <p>Crie sua credencial de acesso ao Portal invoice-generator-c.</p>
+
+            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+                <div class="form-group">
+                    <label for="username">Usuário</label>
+                    <input type="text" id="username" formControlName="username" class="form-control"
+                        placeholder="Digite seu usuário..." />
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-mail Corporativo</label>
+                    <input type="email" id="email" formControlName="email" class="form-control"
+                        placeholder="voce@empresa.com.br" />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Senha forte</label>
+                    <input type="password" id="password" formControlName="password" class="form-control"
+                        placeholder="Ex.: Abcdef1!" />
+                    <small class="field-hint">Mínimo 8 caracteres: maiúscula, minúscula, número e caractere especial.</small>
+                    <small class="field-error" *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.errors?.['strongPassword']">
+                        A senha não cumpre as regras acima.
+                    </small>
+                </div>
+
+                <div class="alert alert-error" *ngIf="errorMsg">
+                    {{ errorMsg }}
+                </div>
+
+                <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid || isLoading">
+                    <span *ngIf="isLoading" class="spinner"></span>
+                    {{ isLoading ? 'Cadastrando...' : 'Criar Conta' }}
+                </button>
+            </form>
+
+            <div class="auth-links">
+                <p>Já possui conta? <a routerLink="/login">Faça Login</a></p>
+            </div>
+        </div>
+    </div>
+    <app-footer></app-footer>
+</div>

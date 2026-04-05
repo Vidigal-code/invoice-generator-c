@@ -1,0 +1,46 @@
+<div class="landing-page">
+    <app-navbar></app-navbar>
+
+    <header class="hero-section">
+        <div class="hero-content">
+            <h1>Revolucione a Gestão dos seus Acordos</h1>
+            <p>Plataforma Enterprise nativa em Nuvem. Simule dívidas de forma imediata, gere boletos instantaneamente
+                através do nosso motor seguro integrado com a AWS e assuma o controle do seu fluxo de caixa corporativo.
+            </p>
+            <div class="hero-actions">
+                <a mat-raised-button color="primary" class="cta-button" routerLink="/login">Acessar Painel</a>
+                <a mat-stroked-button class="cta-button secondary" href="#features">Descobrir Mais</a>
+            </div>
+        </div>
+    </header>
+
+    <section id="features" class="features-section">
+        <h2>Poder Corporativo, Design Moderno</h2>
+        <div class="features-grid">
+
+            <div class="feature-card">
+                <mat-icon class="feature-icon">calculate</mat-icon>
+                <h3>Simulações Nativas</h3>
+                <p>Seus contratos listados perfeitamente num painel e simulados contra potentes algoritmos em
+                    Background, garantindo agilidade sem falsos bloqueios.</p>
+            </div>
+
+            <div class="feature-card">
+                <mat-icon class="feature-icon">lock</mat-icon>
+                <h3>100% Blindado</h3>
+                <p>Autenticação JWT rigorosa, Roles de Acesso (RBAC) isolados e comunicação fluída sem vazamento de
+                    dados inter-tenant no Frontend.</p>
+            </div>
+
+            <div class="feature-card">
+                <mat-icon class="feature-icon">cloud_done</mat-icon>
+                <h3>Arquitetura Cloud-First</h3>
+                <p>Infraestrutura em Containers Orquestrados contendo instâncias AWS S3 para documentações, SQL Server
+                    blindado e processamento com Redis.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <app-footer></app-footer>
+</div>

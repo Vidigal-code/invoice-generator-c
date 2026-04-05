@@ -1,0 +1,49 @@
+<h2 mat-dialog-title>Novo contrato (dívida)</h2>
+<mat-dialog-content class="contract-create-dialog-content">
+  <form [formGroup]="data.form" class="edit-form">
+    <mat-form-field appearance="outline"><mat-label>Número</mat-label><input matInput formControlName="contractNumber"></mat-form-field>
+    <mat-form-field appearance="outline"><mat-label>Devedor</mat-label><input matInput formControlName="debtorName"></mat-form-field>
+    <mat-form-field appearance="outline"><mat-label>CPF / documento</mat-label><input matInput formControlName="debtorDocument" placeholder="11 dígitos se CPF"></mat-form-field>
+    <mat-form-field appearance="outline"><mat-label>Valor original</mat-label><input matInput type="number" formControlName="originalValue"></mat-form-field>
+    <mat-form-field appearance="outline"><mat-label>Saldo atual</mat-label><input matInput type="number" formControlName="currentBalance"></mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Carteira</mat-label>
+      <mat-select formControlName="portfolio">
+        <mat-option *ngFor="let p of data.portfolios" [value]="p.value">{{ p.label }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        <mat-option *ngFor="let s of data.statuses" [value]="s.value">{{ s.label }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Utilizador (vê no dashboard)</mat-label>
+      <mat-select formControlName="ownerUserId">
+        <mat-option [value]="null">Nenhum (só admin)</mat-option>
+        <mat-option *ngFor="let u of data.users" [value]="u.id">{{ u.username }} — {{ u.email }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Qtd. parcelas</mat-label>
+      <input matInput type="number" min="1" [max]="maxInstallments" formControlName="installmentsCount">
+      <mat-hint>Máximo {{ maxInstallments }} parcelas</mat-hint>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>1.º vencimento</mat-label>
+      <input
+        matInput
+        [matDatepicker]="dp"
+        formControlName="firstDueDate"
+        placeholder="dd/MM/aaaa"
+        autocomplete="off">
+      <mat-datepicker-toggle matIconSuffix [for]="dp" tabindex="-1"></mat-datepicker-toggle>
+      <mat-datepicker #dp panelClass="contract-create-datepicker-panel"></mat-datepicker>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="ref.close(false)">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="ref.close(true)" [disabled]="data.form.invalid">Criar</button>
+</mat-dialog-actions>

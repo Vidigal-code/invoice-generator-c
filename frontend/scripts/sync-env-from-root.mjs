@@ -18,13 +18,21 @@ const appTitle =
 const outDir = join(__dirname, '..', 'src', 'environments');
 mkdirSync(outDir, { recursive: true });
 
-const content = `// Gerado por scripts/sync-env-from-root.mjs a partir do .env na raiz do repositório.
+const contentProd = `// Gerado por scripts/sync-env-from-root.mjs a partir do .env na raiz do repositório.
 export const environment = {
-  production: ${production},
+  production: true,
   apiUrl: ${JSON.stringify(apiUrl)},
-  appTitle: ${JSON.stringify(appTitle)},
-} as const;
+  appTitle: ${JSON.stringify(appTitle)}
+};
 `;
 
-const outFile = join(outDir, 'environment.ts');
-writeFileSync(outFile, content, 'utf8');
+const contentDev = `// Gerado por scripts/sync-env-from-root.mjs a partir do .env na raiz do repositório.
+export const environment = {
+  production: false,
+  apiUrl: ${JSON.stringify(apiUrl)},
+  appTitle: ${JSON.stringify(appTitle)}
+};
+`;
+
+writeFileSync(join(outDir, 'environment.ts'), contentProd, 'utf8');
+writeFileSync(join(outDir, 'environment.development.ts'), contentDev, 'utf8');

@@ -1,0 +1,47 @@
+$bar-bg: #003087;
+
+.footer {
+    background: $bar-bg !important;
+    background-color: $bar-bg !important;
+    color: rgba(255, 255, 255, 0.92) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 16px 32px;
+    font-size: 0.875rem;
+}
+
+.footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.footer-copy,
+.footer-author {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.footer-author a {
+    color: #7dd3fc !important;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer {
+        padding: 14px 16px;
+    }
+
+    .footer-inner {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 6px;
+    }
+}

@@ -1,0 +1,43 @@
+<div class="auth-wrapper">
+    <app-navbar></app-navbar>
+    <div class="auth-container">
+        <mat-card class="login-card">
+            <mat-card-header>
+                <mat-card-title>
+                    <span class="card-logo">invoice-generator-c</span>
+                </mat-card-title>
+                <mat-card-subtitle>Entre com suas credenciais corporativas</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>E-mail Corporativo</mat-label>
+                        <mat-icon matPrefix>email</mat-icon>
+                        <input matInput formControlName="email" type="email" />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Senha</mat-label>
+                        <mat-icon matPrefix>lock</mat-icon>
+                        <input matInput formControlName="password" type="password" autocomplete="current-password" />
+                    </mat-form-field>
+
+                    <div class="error-msg" *ngIf="errorMessage">
+                        <mat-icon>error_outline</mat-icon>
+                        {{ errorMessage }}
+                    </div>
+
+                    <button mat-flat-button color="primary" type="submit" class="submit-btn"
+                        [disabled]="loginForm.invalid || isLoading">
+                        <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+                        <span *ngIf="!isLoading">Entrar</span>
+                    </button>
+                </form>
+                <div class="auth-links">
+                    <p>Não possui conta? <a routerLink="/register">Registre-se</a></p>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+    <app-footer></app-footer>
+</div>

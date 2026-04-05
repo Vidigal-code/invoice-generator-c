@@ -1,0 +1,114 @@
+$nav-bg: #003087;
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 32px;
+    background: $nav-bg !important;
+    background-color: $nav-bg !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    height: 56px;
+    color: #fff;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+    white-space: nowrap;
+
+    mat-icon {
+        font-size: 1.4rem;
+        color: #fff;
+    }
+
+    @media (max-width: 480px) {
+        .logo-text {
+            display: none;
+        }
+    }
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.nav-link,
+.nav-link * {
+    color: rgba(255, 255, 255, 0.9) !important;
+
+    mat-icon {
+        font-size: 1rem;
+        vertical-align: middle;
+    }
+
+    &:hover {
+        color: #fff !important;
+    }
+}
+
+.icon-btn {
+    color: #fff !important;
+
+    mat-icon {
+        color: #fff !important;
+    }
+}
+
+.hamburger {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0 16px;
+    }
+
+    .hamburger {
+        display: inline-flex;
+    }
+
+    .nav-link {
+        display: none !important;
+    }
+}
+
+.mobile-menu {
+    display: none;
+    flex-direction: column;
+    background: $nav-bg;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 8px 16px 12px;
+    position: sticky;
+    top: 56px;
+    z-index: 199;
+    gap: 2px;
+
+    &.open {
+        display: flex;
+    }
+}
+
+.menu-item {
+    width: 100%;
+    justify-content: flex-start !important;
+    color: #fff !important;
+    gap: 8px;
+
+    mat-icon,
+    .mdc-button__label,
+    span {
+        color: #fff !important;
+    }
+}

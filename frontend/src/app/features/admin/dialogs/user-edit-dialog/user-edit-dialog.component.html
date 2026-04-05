@@ -1,0 +1,18 @@
+<h2 mat-dialog-title>Editar Usuário</h2>
+<mat-dialog-content>
+  <form [formGroup]="data.form" class="edit-form">
+    <mat-form-field appearance="outline"><mat-label>Username</mat-label><input matInput formControlName="username"></mat-form-field>
+    <mat-form-field appearance="outline"><mat-label>Email</mat-label><input matInput formControlName="email"></mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Role</mat-label>
+      <mat-select formControlName="roleId">
+        <mat-option *ngFor="let r of data.roles" [value]="r.id">{{ r.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-slide-toggle formControlName="isActive">Ativo</mat-slide-toggle>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="ref.close(false)">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="ref.close(true)" [disabled]="data.form.invalid">Salvar</button>
+</mat-dialog-actions>

@@ -1,0 +1,72 @@
+<mat-sidenav-container class="sidenav-container">
+
+  <mat-sidenav #sidenav position="start" mode="over" class="sidenav">
+    <mat-toolbar color="primary" class="sidenav-header">
+      <mat-icon>request_quote</mat-icon>
+      <span>Menu</span>
+    </mat-toolbar>
+    <mat-nav-list>
+      <a mat-list-item routerLink="/dashboard" (click)="sidenav.close()">
+        <mat-icon matListItemIcon>dashboard</mat-icon>
+        <span matListItemTitle>Painel</span>
+      </a>
+
+      <a mat-list-item *ngIf="appState.currentUserRole() === 'Admin'" routerLink="/admin" (click)="sidenav.close()">
+        <mat-icon matListItemIcon>admin_panel_settings</mat-icon>
+        <span matListItemTitle>Logs (Admin)</span>
+      </a>
+
+      <mat-divider></mat-divider>
+
+      <a mat-list-item (click)="toggleTheme(); sidenav.close()">
+        <mat-icon matListItemIcon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        <span matListItemTitle>Modo {{ isDarkMode ? 'Claro' : 'Escuro' }}</span>
+      </a>
+
+      <a mat-list-item (click)="logout(); sidenav.close()">
+        <mat-icon matListItemIcon>exit_to_app</mat-icon>
+        <span matListItemTitle>Sair</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="sidenav-content">
+
+    <mat-toolbar color="primary" class="app-toolbar">
+      <button mat-icon-button (click)="sidenav.toggle()" aria-label="Toggle sidenav" class="mobile-menu-btn">
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <span class="app-title">{{ appTitle }}</span>
+      <span class="spacer"></span>
+
+      <span class="user-info desktop-only" *ngIf="appState.currentUsername()">
+        <mat-icon class="user-icon">person</mat-icon>
+        {{ appState.currentUsername() }}
+        <span class="role-badge" *ngIf="appState.currentUserRole() === 'Admin'">Admin</span>
+      </span>
+
+      <a mat-icon-button routerLink="/admin" class="desktop-only" *ngIf="appState.currentUserRole() === 'Admin'"
+        matTooltip="Logs Admin">
+        <mat-icon>admin_panel_settings</mat-icon>
+      </a>
+
+      <button mat-icon-button (click)="toggleTheme()" aria-label="Toggle dark mode" class="desktop-only"
+        matTooltip="{{ isDarkMode ? 'Modo Claro' : 'Modo Escuro' }}">
+        <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </button>
+
+      <button mat-icon-button (click)="logout()" class="desktop-only" matTooltip="Sair">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <div class="page-body">
+      <div class="content-wrapper">
+        <router-outlet></router-outlet>
+      </div>
+      <app-footer></app-footer>
+    </div>
+
+  </mat-sidenav-content>
+</mat-sidenav-container>

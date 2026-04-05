@@ -1,0 +1,117 @@
+.viewer-wrapper {
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.viewer-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    gap: 16px;
+    color: var(--text-secondary);
+
+    p {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+}
+
+.viewer-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 24px;
+    gap: 12px;
+    color: var(--text-secondary);
+
+    mat-icon {
+        font-size: 2.4rem;
+        width: 2.4rem;
+        height: 2.4rem;
+        color: #ef5350;
+    }
+
+    p {
+        margin: 0;
+        font-size: 0.9rem;
+        text-align: center;
+    }
+}
+
+.viewer-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.toolbar-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.toolbar-icon {
+    font-size: 1.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    color: var(--accent-color);
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.billet-iframe {
+    width: 100%;
+    height: 640px;
+    border: none;
+    display: block;
+    background: #fff;
+}
+
+@media (max-width: 768px) {
+    .viewer-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .toolbar-actions {
+        width: 100%;
+
+        button {
+            flex: 1;
+        }
+    }
+
+    .billet-iframe {
+        height: 480px;
+    }
+}

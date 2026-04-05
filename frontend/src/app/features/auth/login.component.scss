@@ -1,0 +1,90 @@
+.auth-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--bg-color);
+}
+
+.auth-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1rem;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 440px;
+    padding: 28px 20px 20px;
+    border-radius: 16px !important;
+    background: var(--bg-surface) !important;
+}
+
+.card-logo {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--accent-color);
+}
+
+.full-width {
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.error-msg {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #e53935;
+    margin-bottom: 16px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.submit-btn {
+    width: 100%;
+    height: 48px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.auth-links {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+
+    a {
+        color: var(--accent-color);
+        text-decoration: none;
+        font-weight: 500;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+:host-context(body.dark-theme) {
+    .auth-wrapper {
+        background-color: var(--bg-color);
+    }
+
+    .login-card {
+        background: var(--bg-surface) !important;
+        border-color: var(--border-color) !important;
+    }
+
+    .card-logo {
+        color: var(--accent-color);
+    }
+
+    .auth-links {
+        color: var(--text-primary);
+    }
+}
