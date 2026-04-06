@@ -364,6 +364,302 @@
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
       "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 10,
+      "title": {
+        "pt": "Detalhes Backend",
+        "en": "Backend Details",
+        "es": "Detalles Backend"
+      },
+      "description": {
+        "pt": "Arquitetura e módulos",
+        "en": "Architecture and modules",
+        "es": "Arquitectura y módulos"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/backend-details.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/backend-details.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/backend-details.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 11,
+      "title": {
+        "pt": "Detalhes Frontend",
+        "en": "Frontend Details",
+        "es": "Detalles Frontend"
+      },
+      "description": {
+        "pt": "Componentes e Angular",
+        "en": "Components and Angular",
+        "es": "Componentes y Angular"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/frontend-details.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/frontend-details.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/frontend-details.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 12,
+      "title": {
+        "pt": "Infraestrutura",
+        "en": "Infrastructure",
+        "es": "Infraestructura"
+      },
+      "description": {
+        "pt": "Acesso a dados e Redis",
+        "en": "Data access and Redis",
+        "es": "Acceso a datos y Redis"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/infrastructure-services.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/infrastructure-services.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/infrastructure-services.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 13,
+      "title": {
+        "pt": "Aplicação e CQRS",
+        "en": "Application & CQRS",
+        "es": "Aplicación y CQRS"
+      },
+      "description": {
+        "pt": "MediatR e FluentValidation",
+        "en": "MediatR and FluentValidation",
+        "es": "MediatR y FluentValidation"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/application-cqrs.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/application-cqrs.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/application-cqrs.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 14,
+      "title": {
+        "pt": "CI/CD e Deploy",
+        "en": "CI/CD Deployment",
+        "es": "CI/CD y Despliegue"
+      },
+      "description": {
+        "pt": "Docker, GitHub Actions",
+        "en": "Docker, GitHub Actions",
+        "es": "Docker, GitHub Actions"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/ci-cd-deployment.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/ci-cd-deployment.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/ci-cd-deployment.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 15,
+      "title": {
+        "pt": "Entidades de Domínio",
+        "en": "Domain Entities",
+        "es": "Entidades de Dominio"
+      },
+      "description": {
+        "pt": "Modelos Core e DDD",
+        "en": "Core Models and DDD",
+        "es": "Modelos Core y DDD"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/domain-entities.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/domain-entities.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/domain-entities.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 16,
+      "title": {
+        "pt": "Ambiente Local",
+        "en": "Local Environments",
+        "es": "Entorno Local"
+      },
+      "description": {
+        "pt": "Docker Compose Setup",
+        "en": "Docker Compose Setup",
+        "es": "Configuración Compose"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/local-environments.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/local-environments.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/local-environments.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 17,
+      "title": {
+        "pt": "Estado do Frontend",
+        "en": "State Management",
+        "es": "Estado Frontend"
+      },
+      "description": {
+        "pt": "Padrões Reativos",
+        "en": "Reactive Patterns",
+        "es": "Patrones Reactivos"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/state-management.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/state-management.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/state-management.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
     }
   ],
   "menus-header-md": [
@@ -500,6 +796,126 @@
       "es": {
         "title": "Colas RMQ",
         "path-click": "gitpagedocs/docs/versions/1.0.0/es/queue-management.md"
+      }
+    },
+    {
+      "id": 10,
+      "pt": {
+        "title": "Detalhes Backend",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/backend-details.md"
+      },
+      "en": {
+        "title": "Backend Details",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/backend-details.md"
+      },
+      "es": {
+        "title": "Detalles Backend",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/backend-details.md"
+      }
+    },
+    {
+      "id": 11,
+      "pt": {
+        "title": "Detalhes Frontend",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/frontend-details.md"
+      },
+      "en": {
+        "title": "Frontend Details",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/frontend-details.md"
+      },
+      "es": {
+        "title": "Detalles Frontend",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/frontend-details.md"
+      }
+    },
+    {
+      "id": 12,
+      "pt": {
+        "title": "Infraestrutura",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/infrastructure-services.md"
+      },
+      "en": {
+        "title": "Infrastructure",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/infrastructure-services.md"
+      },
+      "es": {
+        "title": "Infraestructura",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/infrastructure-services.md"
+      }
+    },
+    {
+      "id": 13,
+      "pt": {
+        "title": "App e CQRS",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/application-cqrs.md"
+      },
+      "en": {
+        "title": "App & CQRS",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/application-cqrs.md"
+      },
+      "es": {
+        "title": "Aplicación CQRS",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/application-cqrs.md"
+      }
+    },
+    {
+      "id": 14,
+      "pt": {
+        "title": "CI/CD/Deploy",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/ci-cd-deployment.md"
+      },
+      "en": {
+        "title": "CI/CD/Deploy",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/ci-cd-deployment.md"
+      },
+      "es": {
+        "title": "CI/CD/Deploy",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/ci-cd-deployment.md"
+      }
+    },
+    {
+      "id": 15,
+      "pt": {
+        "title": "Dominio",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/domain-entities.md"
+      },
+      "en": {
+        "title": "Domain Entities",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/domain-entities.md"
+      },
+      "es": {
+        "title": "Dominio",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/domain-entities.md"
+      }
+    },
+    {
+      "id": 16,
+      "pt": {
+        "title": "Ambiente Local",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/local-environments.md"
+      },
+      "en": {
+        "title": "Local Env",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/local-environments.md"
+      },
+      "es": {
+        "title": "Ambiente Local",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/local-environments.md"
+      }
+    },
+    {
+      "id": 17,
+      "pt": {
+        "title": "Estado Frontend",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/state-management.md"
+      },
+      "en": {
+        "title": "State Mgmt",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/state-management.md"
+      },
+      "es": {
+        "title": "Estado Frontend",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/state-management.md"
       }
     }
   ],
