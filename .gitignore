@@ -2,4 +2,4 @@
 backend/bin/
 backend/obj/
 .idea
-
+.vscode
