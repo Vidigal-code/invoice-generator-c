@@ -48,7 +48,7 @@ Use the **`api`** service port from Compose (e.g. **`http://localhost:5283`** if
 
 Optional **TDD profiles**: `docker compose --profile test up` runs **backend-test** (`dotnet test`) and **frontend-test** (`ng test` headless).
 
-**Quick start:** configure root **`.env`** (see **`.env.example`**), then:
+**Quick start:** configure root **`.env`** (see **`envexample.txt`**), then:
 
 ```bash
 docker compose up --build
@@ -92,7 +92,7 @@ Porta do serviço **`api`** no Compose (ex.: **`http://localhost:5283`**).
 
 **Docker Compose** inclui **SQL Server**, **API**, **frontend**, **Redis**, **RabbitMQ**, **Elasticsearch** e **LocalStack** (S3). Perfil **`test`** para **xUnit** e **Karma** em CI local.
 
-**Início rápido:** configurar **`.env`** na raiz (ver **`.env.example`**), depois:
+**Início rápido:** configurar **`.env`** na raiz (ver **`envexample.txt`**), depois:
 
 ```bash
 docker compose up --build
