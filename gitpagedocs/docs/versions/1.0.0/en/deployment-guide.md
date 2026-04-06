@@ -1,33 +1,59 @@
-# Deployment Guide
+# Advanced Deployment Guide (CI/CD)
 
-The **Invoice Generator C** is heavily containerized, ensuring that transitioning from a local scenario into a full Cloud Production environment is as natural and fault-tolerant as possible.
+Transitioning from a mock-heavy isolated Docker environment into Production is highly supported and architecturally straight.
 
-## 1. Environments and Variables
+## 1. Cloud Ecosystem Targets (AWS Example)
 
-Before hitting any Production builds, it is immensely essential to inject proper connection string scopes corresponding correctly toward targeted containers:
-- `ConnectionStrings__DefaultConnection`: Production endpoint targeting the real SQL Database.
-- `RabbitMQ__Host`, `RabbitMQ__Username`, `RabbitMQ__Password`: Secured endpoint paths corresponding alongside RabbitMQ clusters.
-- `Redis__ConnectionString`: Production-ready configurations addressing an active Redis High-Performance Service.
+For true horizontal elasticity, deploying into **Amazon Web Services (AWS)** relies heavily mapping your local elements into robust managed instances.
 
-## 2. Docker Compose (Local & Staging)
+| Local Container | AWS Managed Service Equivalent | Purpose in Production |
+|------|-----------|-----------|
+| **sqlserver** | AWS RDS (SQL Server) | Automated backups, multi-AZ reliability. |
+| **redis** | AWS ElastiCache | Absolute extreme IO metrics for safe distributed locks. |
+| **rabbitmq** | Amazon MQ (RabbitMQ) | Eradicates custom broker downtime management. |
+| **api** | ECS Fargate or EKS Pod | Scales automatically adjusting compute capacities matching HTTP thresholds. |
+| **frontend** | S3 Static + CloudFront | Delivers Angular files blazingly fast around the globe. |
+| **localstack** | AWS S3 Bucket | Secured document attachments naturally natively stored protecting generated Boletos. |
 
-Found structurally planted within the root domain stands our `docker-compose.yml`. During Staging intervals, one can re-execute it easily:
+## 2. GitHub Actions CI/CD Pipeline Mockup
 
-```bash
-docker-compose -f docker-compose.yml up -d
+An exemplary `deploy.yml` pipeline pushes the Angular builder heavily distributing into Cloudfront domains whilst running dotNet commands generating lean images.
+
+```yaml
+name: Global Build Pipeline
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build_frontend:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Node Prep
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+    - name: Static Gen
+      run: |
+        npm install
+        npm run build --configuration=production
+
+  build_backend:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: .NET Sandbox
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+    - name: Compile Tests
+      run: dotnet test
+    - name: Push Container
+      run: docker build -t igc-api ./backend
 ```
-It immediately boots up the cascaded service layer (Backend, Nginx Frontend, Mocks across Localstack, SQL Databases, Redis).
 
-## 3. Production Deployment (CI/CD Recommended)
+## 3. Entity Framework Data Handlers
 
-Targeting a true **Production-Grade** environment (AWS ECS, Kubernetes or Azure Container Apps/Pods), compilation rules change drastically via detachment contexts:
-- **Backend**: Strict Image Creation targeted solely around `Dockerfile`.
-- **Frontend (Angular)**:
-    ```bash
-    npm run build --configuration=production
-    ```
-    The generated core artifact files (the `dist/` directories) are packed neatly onto their dedicated Nginx service (built via `docker/nginx/default.conf`) rendering statics across `Port 80` whilst accurately upstreaming REST operations facing `/api`.
-
-## 4. Entity Framework Migrations
-
-Entity Framework core will not execute automatic migrations isolated within containers unless exclusively rigged through `Program.cs`. Ensure that the initialized backend environment container has true network reach alongside sufficient connection privileges granting full-fledged automated migrations context-driven runs via `context.Database.Migrate()`. Optionally, SQL initialization scripts, like `init.sql`, can serve effectively well.
+Never run `context.Database.Migrate()` autonomously bundled alongside several parallel scaled backend API Instances on boot — this invokes huge lock catastrophes within RDS bounds resulting into partial migrations applying destructively.
+- Segregate database seeding onto a dedicated Pipeline Stage (Ex: *Migration Worker* container executed uniquely, running EF Core CLI directly on top of the fresh artifact instance pointing to your safe environment string variable).

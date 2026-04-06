@@ -1,25 +1,42 @@
-# Frontend Components
+# Frontend Deep-Dive
 
-The Frontend of **Invoice Generator C** is architected on Angular 17. The focus remains on an impeccably clean, highly scalable interface centered on a multiplatform experience.
+**Invoice Generator C** embraces a fully standalone Angular 17 interface. It is architecturally decoupled keeping component separation rigid across business features.
 
-## Styling Standard
-We extensively rely on **Angular Material**. We applied exhaustive customizations (inside `styles.scss`) offering meticulous support for `Dark Mode`. Complex elements — like historical tables or the Global Navigation Menu and the Footer — fluidly cast their correct dynamic adaptive shades during theme shifts.
+## 1. Sub-Modules Separation
 
-## Main Modules
+The routing scheme separates logical areas utilizing native Lazy Loading keeping initial browser payload minuscule:
+- `admin-logs.component` (`/admin`): Contains high-fidelity MatTable lists featuring pagination controls coupled alongside `Subject`-driven Debouncers for massive query strings avoiding API throttling.
+- `dashboard.component` (`/dashboard`): Organises grouped sub-debts. Binds complex loading logic checking for RabbitMQ events dynamically rendering `mat-snack-bar` updates.
+- `billet-viewer.component`: Special child-route bound for secure iframe embeddings tracking blob-like streams fetching presigned PDFs directly over the mocked LocalStack S3 instances securely. 
 
-### `DashboardComponent`
-The primary pivot for standalone client interaction.
-- **Portfolios:** Propagates the debtor’s open debts grouping them with a robust `MatTable`.
-- **Buttons and Dialogs:** The agreement and payment requests open a loading gateway spinner right until the backend fires a resolution flag via RabbitMQ Events or fast-polling.
-- **Custom Pipes:** Responsible for Formatting Currency Outputs and masked documents parsing (CPF/CNPJ).
+## 2. Global Interceptors and Auth Flows
 
-### `BilletViewerComponent`
-The specific display widget to project the finalized payment slit.
-- Automatic sniffing to decide whether the returned content sourced securely via LocalStack S3 URL warrants an IFrame or pure HTML rendering format.
-- Features potent sandbox mechanics alongside native protections buffering out _Clickjacking_ flaws or uncontrolled download forces without displaying an immediate prior preview.
+Since we opted against exposing raw JWT variables inside local-storage to battle potential XSS infiltrations, our core interceptors merely enforce proper inclusion flags:
 
-### `AdminLogsComponent` and Backend Ops
-Pivots the operational backstage settings of the platform.
-- Full filter-combined matrix sets (Search by Debtor Name, System Event Log, Identifier ID).
-- Pre-Debouncer-Driven Pagination loops.
-- Colored informative tags highlighting exact status statuses combined directly with traces of IP origins.
+```typescript
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const secureReq = req.clone({
+    withCredentials: true // Permits transmission of strictly HttpOnly secured JWT fragments
+  });
+  return next(secureReq);
+};
+```
+
+## 3. Sandboxing Billet Downloads
+
+Visualizing the concluded agreements inside the frontend mandates the `sandbox` directive ensuring zero chance malicious scripts leak outside the generated document.
+
+```html
+<iframe
+    [src]="pdfSafeUrl"
+    sandbox="allow-same-origin allow-scripts"
+    [title]="'Contrato'">
+</iframe>
+```
+
+## 4. Angular Material Dark Mode
+
+A critical business constraint demanded a sophisticated dark mode toggle. Inside `styles.scss` the global theme variables wrap deeply across classes overhauling everything:
+- **Mat-Chips**: Adapt to softer colors avoiding burn-outs.
+- **Form Inputs**: Outline colors transition to higher-opacity whites.
+- **Elevation Shadows**: Swap from hard drop shadows into subtle structural separations keeping clarity solid regardless of lighting constraints.

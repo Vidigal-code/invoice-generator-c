@@ -1,33 +1,59 @@
-# Guía de Despliegue
+# Disposiciones Avanzadas al Despliegue Crítico (CI/CD)
 
-**Invoice Generator C** fue diseñado desde su concepción para estar altamente contenizado. De esta manera, habilitamos un paso natural con el menor número de fallas desde instancias de experimentación local hacia un entorno Cloud Corporativo.
+Saltar el foso virtual de su aislamiento en simulación _Local Dockerizada_ y elevar íntegramente todo bloque funcional de manera madura sobre estamentos productivos se perfila maravillosamente pulcro a causa de nuestro total aislamiento perimental. 
 
-## 1. Entornos y Configuraciones Variables
+## 1. Mapeo Topológico En Cloud Escalado (Ej. Directrices Amazon AWS)
 
-Antes de la puesta en escena para Producción Estricta, asegúrese fuertemente de proveer o inyectar las variables apropiadas en las rutas designadas de los micro-servicios:
-- `ConnectionStrings__DefaultConnection`: Refleja el Punto de Conexión de su base SQL definitiva (Production).
-- `RabbitMQ__Host`, `RabbitMQ__Username`, `RabbitMQ__Password`: Credenciales protegidas exclusivas del ambiente MQ.
-- `Redis__ConnectionString`: Conexión directa a servicios Redis de alto desempeño y/o clústeres.
+Abrazando expansiones formidables sin mermar la potencia resolutivas y logrando elasticidades robustas automáticas garantizadas horizontalmente re-enlazamos contenedores efímeros bajo paraguas administrados fiables:
 
-## 2. Abordaje en Docker Compose (Pruebas y Staging)
+| Base Contenedora de Prueba | Equivalente Gestionado Directo AWS | Impacto De Migración Activo |
+|------|-----------|-----------|
+| **sqlserver** | Ambiente Relacional AWS RDS | Copias incrementales temporizadas sin error humano y reanimaciones con redundancia Multi-AZ ciegas e instantáneas. |
+| **redis** | Celdas Memory AWS ElastiCache | Reactividad veloz de ultra bajísimo latido fortificando inmensamente cada ciclo y tranca temporal atada a cancelaciones. |
+| **rabbitmq** | Corriente Virtualizada Amazon MQ | Purga total toda administración agotadora y reinserción manual en colapso interno. Se reconstruye y auto reencamina sobre fracasos o pérdidas totales. |
+| **api** | Islas Agrupadas Célula ECS Fargate | Explota y triplica pods virtualizados simultáneos contrarrestando avalanchas durante exigencias duras de cobros a fin de mes. |
+| **frontend** | Contenedor Limpio S3 Auxiliado CloudFront | Absorbe la web en estado rígido minificado para expulsarlo repartidamente global como estalagmita inmutable sin saturación perimetral a bases de cómputo directas. |
+| **localstack** | Envuelta Suprema Involcable S3 Nativa | Bodega maestra donde pernoctarán miles o millones de fojas en formato PDF o XML cifrados asegurando perdurabilidad absoluta blindada. |
 
-Fácilmente identificable en la raíz matriz inicial se ubica un consolidado `docker-compose.yml`. A modo Staging o Previo, puede reutilizar este molde general:
+## 2. Automatización Continua (CI/CD GitHub Actions Ejemplar)
 
-```bash
-docker-compose -f docker-compose.yml up -d
+Ente rector orquestando flujos puros emitiendo órdenes compresión angulares nativas distribuidoras y validando pruebas C# empaquetando al contenedor inmutable productivo definitivo listo al zarpe.
+
+```yaml
+name: Ensamblaje Supremo Unificado Tareas Fijas
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build_frontend:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Pre Ensamblaje Angular Pistas
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+    - name: Formación Y Poda SPA Compresiva
+      run: |
+        npm install
+        npm run build --configuration=production
+
+  build_backend:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Aditamentos Base .NET Ambientes Ciegos
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+    - name: Rastros De Validación Restricta Pura (Unitaria)
+      run: dotnet test
+    - name: Amoldar Estructuras Al Contenedor Previo Subida Final
+      run: docker build -t igc-api ./backend
 ```
-El mandato enciende las cascadas de interservicios de forma encadenada (Backend, Frontend atado a Nginx, Simuladores S3 Localstack, Bases puras de datos...).
 
-## 3. Despliegue a Producción Verdadera (Modelos CI/CD)
+## 3. Disposiciones Con Bases de Datos Críticas Y Semillas
 
-En un ambiente catalogado de grado **Producción (Production-Grade)** (AWS ECS, Kubernetes, Interacciones Azure Apps), debe dividirse notoriamente su modelo de ensamble unitario en contenedores dedicados:
-- **Backend**: Generación absoluta utilizando solo en las directivas que dictan su `Dockerfile` matriz.
-- **Frontend (Angular)**:
-    ```bash
-    npm run build --configuration=production
-    ```
-    Aquellos artefactos terminados tras su compresión en la ruta (`dist/`) se empaquetan en solitario junto con la versión web Nginx que provee el código en (`docker/nginx/default.conf`). La ruta aloja de forma paralela la comunicación estática abierta (`Port 80`) y encauza correctamente peticiones provenientes del `/api` al backend sin interferencias.
-
-## 4. Migraciones de Datos (Entity Framework)
-
-Los motores de Entity Framework en la familia de tecnología DotNet actual no procesarán en automático cargas de migración profunda dentro de su contenedor general sin orden expresa ubicada dentro del modelo `Program.cs`. Confirme siempre que el contenedor instanciador dotNet puede visibilizar transparentemente el servicio del puerto SQL teniendo permisos plenos al momento de mandar secuencias `context.Database.Migrate()`. Por otra parte se encuentra a disposición correr directamente semillas primigenias como las ubicadas estructuralmente bajo denominación `init.sql`.
+Burlar y violar dictamen seguro llamando indiscriminadas rutinas insertadas desde el `Program.cs` originadas globalmente vía el clásico `context.Database.Migrate()` trae la desgracia de arrancar mutaciones destructivas en tablas compartidas o bloquear masificaciones temporales arruinando sus historiales y dejando bases corruptas o partidas a medio ejecutar porque varias copias de su servidor levantado colisionan.
+- Asista la etapa con un *paso rígido transitorio Pipeline Exclusivo* forzando que mande a despertar en asilamiento una imagen fugaz aplicando ciegamente migraciones puras sin estorbos en su único ciclo de labor e hilos solitarios, extinguiéndose instantáneamente luego de validar la asimilación correcta por el gestor de datos universal general.

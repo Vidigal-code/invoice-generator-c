@@ -1,25 +1,42 @@
-# Componentes do Frontend
+# Frontend: Observações e Estruturas Ocultas
 
-O Frontend do **Invoice Generator C** é concebido sobre Angular 17. O foco é uma interface limpa, escalável e focada na experiência em dispositivos multiplataforma.
+**Invoice Generator C** firma seu alicerce em cima do robusto Angular 17. Ele está fragmentado logicamente em componentes puros mantendo lógicas de _features_ radicalmente distintas em subpastas isoladas.
 
-## Padrão de Estilização
-Utilizamos extensivamente o **Angular Material**. Tivemos um rigor na customização (no `styles.scss`) com suporte minucioso ao `Modo Escuro (Dark Mode)`. Elementos complexos, como tabelas de histórico ou o Menu de Navegação Global e Footer renderizam as cores dinâmicas adaptativas corretas na inversão de temas.
+## 1. Separação Estrita dos Módulos Funcionais
 
-## Módulos Principais
+A árvore de carregamentos impõe severo _Lazy Loading_ otimizando drasticamente os pacotes enviados à placa de render do navegador (browser payload):
+- `admin-logs.component` (`/admin`): Carrega a densa estrutura das matrizes da `MatTable`, manipulando instâncias atreladas `Debouncers` via RxJS acoplando requisições imensas e não entupindo requisições ao Back.
+- `dashboard.component` (`/dashboard`): Tabulador de contratos e faturas secundárias. Amarram `mat-snack-bar` monitorando dinamicamente laços vindos de _RabbitMQ events_ sobre formalização terminada.
+- `billet-viewer.component`: Módulo de exibição hermético com amarrações seguras carregando via iFrame a exibição de arquivos em Mockados via AWS S3 perfeitamente assinados.
 
-### `DashboardComponent`
-O nó central de visualização do cliente autônomo.
-- **Portfólios:** Apresenta via `MatTable` as díridas abertas do devedor e gerencia agrupamento.
-- **Botões e Dialogs:** Formalização e pagamentos resultam no popup de loading contínuo até a resposta backend via RabbitMQ Event ou polling rápido.
-- **Pipes Customizados:** Formatação de Valores da Moeda e Conversão de Documento (CPF/CNPJ).
+## 2. Interceptors Globais e Trânsito Auth
 
-### `BilletViewerComponent`
-O componente responsável por mostrar a ficha final.
-- Reconhecimento automático se o anexo vindo através do LocalStack S3 é renderizável via URL encriptada ou iframe puro (PDF ou HTML).
-- Tem um _sandbox_ forte e mecanismos nativos contra _Clickjacking_ ou Download Forçado sem prévio preview.
+Como abolimos ferozmente alocações brutas do token (JWT) na falha vitrine de `local-storage` para obliterar injeções XSS nefastas, o esqueleto de base acentua intercepções silenciosas invisíveis e vitais:
 
-### `AdminLogsComponent` e Moderação
-Gestão por trás das cortinas da plataforma.
-- Tabela com filtros combinados (Nome do Devedor, Log do Sistema, ID).
-- Paginação otimizada com debounce-time.
-- Status Chips informativos codificados por cores dependendo dos eventos e de _IP Traces_ registrados.
+```typescript
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const secureReq = req.clone({
+    withCredentials: true // Libera o envio seguro blindado de Cookies HttpOnly restritos transacionalmente.
+  });
+  return next(secureReq);
+};
+```
+
+## 3. Renderização Hermética na Emissão do Boleto
+
+Exibir documentos finais em formatos cruciais exigiu enclausurar o componente em correntes inquebráveis: `sandbox`. Garante chance absoluta zero de injeção JavaScript caso ocorra envenenamento vindo nas amarras da nuvem AWS.
+
+```html
+<iframe
+    [src]="pdfSafeUrl"
+    sandbox="allow-same-origin allow-scripts"
+    [title]="'Visualizador Boleto'">
+</iframe>
+```
+
+## 4. Modo Noturno Absoluto (Dark Mode Material)
+
+O compromisso executivo e estético forçaram suporte nativo impecável nas rotas. Dentro do `styles.scss` há varreduras universais refatorando profundamente:
+- **Mat-Chips**: Adaptam para contrastes frios evitando desgastes agressivos de visão ocular.
+- **Bordas Mat-Inputs**: As linhas contornáveis repassam coloração branco ofuscada e adaptativa no foco de teclado.
+- **Elevações Box-Shadow**: Recuo inteligente nos contrastes brutais transformando recuos z-index numa transição refinada imitando painéis e vitrines iluminadas minimamente.

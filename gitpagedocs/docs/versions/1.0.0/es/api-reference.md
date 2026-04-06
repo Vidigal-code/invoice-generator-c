@@ -1,21 +1,87 @@
-# Referencia de la API
+# Detalles Estrictos OpenAPI / Swagger
 
-El Backend expone una API RESTful exhaustiva, documentada a la vez mediante Swagger y ReDoc, que cuenta con soporte bilingüe (inglés y portugués).
+La **Invoice Generator C** estipula y protege los pasajes en puro acatamiento estructural de protocolos RESTful.
 
-## Endpoints Principales
+## 1. Estrato Inicial Base Requerido (`/api/Auth`)
 
-### Autenticación (`/api/Auth`)
-- `POST /login`: Procesa credenciales y retorna Cookies HttpOnly en su versión más estricta con el respectivo JWT. Está sujeto a regulaciones fuertes de límites de petición (Rate Limiting).
-- `POST /register`: Registra cuentas respetando las reglas delineadas bajo el protocolo `strongPasswordValidator`.
+La inmersión del operador requiere saludo validado propiciando empaquetaduras inalterables de red: `HttpOnly Cookies`.
 
-### Panel Admin (`/api/AdminPanel`)
-Endpoints con permisos limitados y de corte exclusivo para Administradores (verificados de primera mano en `RouteProtectionMiddleware`).
-- `GET /logs`: Retorna los completos registros de auditoría que inician su rastro dentro del Audit Service.
-- `GET /contracts`: Lista completa de interacciones con el portafolio y los historiales de los clientes en contexto general.
+### `POST /api/Auth/login`
+El puente vital para validación analítica temporal. Limitado de forma agresiva mediante contadores defensivos Rate-Limiter atajando dictados y abusos malintencionados con múltiples pruebas (Dictionary Attacks).
 
-### Pagos y Acuerdos (`/api/Agreements`)
-- `POST /formalize`: Principal detonador que lanza un boleto inicial o una operación con PIX. Goza de un blindaje fundamentado en Redis llamado *Distributed Locking*.
-- `GET /billet/{id}`: Devuelve la fuente de visualización y headers de proxy pertinentes para que el IFAme renderice el boleto sin recaer a vulnerabilidades de Base64.
+**Estructura del Intercambio (JSON Payload):**
+```json
+{
+  "email": "admin@system.local",
+  "password": "Admin@12345_Str0ng"
+}
+```
 
-## Rate Limiting y Restricciones de Payload
-El sistema resguarda su eficiencia limitando los envíos o descargas sobredimensionadas. Las peticiones considerables (generalmente superiores a unos cuantos megabytes) y ataques abrumadores reciben la devolución automática del estado `429 Too Many Requests`.
+**Retribución Operativa (200 OK + Intercepción Nativa `Set-Cookie` Headers):**
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "data": {
+    "accessToken": "eyJhbG...", // Absorbido sutilmente mediante navegadores de confianza en segundo plano
+    "userName": "Asignación Plataforma",
+    "roles": ["Admin", "Super"]
+  }
+}
+```
+
+## 2. Visores Panel Historiales Administradores (`/api/AdminPanel`)
+
+Obstruido operativamente para tránsitos simples. Gobierna lógicas ciegas blindadas provenientes del contorno `.NET RouteProtectionMiddleware`.
+
+### `GET /api/AdminPanel/logs?page=1&limit=25`
+Indaga huellas marcadas incansablemente por auditores in-house con orígenes identificativos IP pseudo-ofuscados.
+
+**Demostración Restitución Limitada (200 OK):**
+```json
+{
+  "totalItems": 1599,
+  "currentPage": 1,
+  "items": [
+    {
+      "id": "e434cd...",
+      "timestamp": "2024-03-01T15:00:23Z",
+      "level": "Warning",
+      "message": "Infracción transaccional atajada por Tranca de Memoria.",
+      "maskedIp": "192.168.***.***",
+      "userId": "90fe-421..."
+    }
+  ]
+}
+```
+
+## 3. Concreción Digerida Hacia Deudas Vivas (`/api/Agreements`)
+
+Delegador orquestal que mueve engranajes ocultos paralelos amarrados tras muros de Memoria Abierta Rápida (Redis) disparando estampadoras en C# (QuestPDF).
+
+### `POST /api/Agreements/formalize`
+Desacoplador robusto solicitando en primera orden total bloqueador limitante contra peticiones clónicas.
+
+**Inyección Acordada:**
+```json
+{
+  "contractId": "bca8b789-54d1...",
+  "paymentMethod": "PIX_BILLET",
+  "agreedTotalValue": 1055.99
+}
+```
+
+**Rechinado De Inmunidad Simultáneo (409 Conflict):**
+```json
+{
+  "success": false,
+  "errors": {
+    "message": "Fijación estricta correntada actualmente impidiendo solapamientos. Reintente ulteriormente."
+  }
+}
+```
+
+## 4. Retorno Efímero Y Resguardado
+
+### `GET /api/Agreements/billet/{id}`
+Saca a flote contraseñas temporales al vuelo de lectura efímera (`Pre-Signed AWS Mock Links`) acoplándose inteligentemente contra subcajas web puras `Iframes`. Rehúye despóticamente colapsos lentos sufridos enviando cargas titánicas crudas por secuencias binarias directas `Base64` al front.

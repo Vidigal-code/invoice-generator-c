@@ -1,21 +1,87 @@
-# Referência da API
+# Especificações Rigorosas da API REST
 
-O Backend expõe uma API RESTful completa e documentada simultaneamente via Swagger e ReDoc com suporte bilingue (Inglês e Português).
+A **Invoice Generator C** estipula rotas em pleno acordo às diretrizes severas de RESTful.
 
-## Endpoints Principais
+## 1. Camada de Autenticação Central (`/api/Auth`)
 
-### Autenticação (`/api/Auth`)
-- `POST /login`: Recebe credenciais e devolve Cookies HttpOnly seguros e estritos contendo o JWT de autorização. Limite de requisições rigoroso (Rate Limiting).
-- `POST /register`: Cria usuários seguindo o `strongPasswordValidator`.
+A imersão primária requisita aperto de mão (handshake) retornando _encapsuladores HttpOnly Cookies_.
 
-### Admin Panel (`/api/AdminPanel`)
-Restritos a Administradores (verificados no `RouteProtectionMiddleware`).
-- `GET /logs`: Retorna logs de auditoria detalhados emitidos pelo Audit Service.
-- `GET /contracts`: Lista completas as interações dos clientes e históricos no sistema.
+### `POST /api/Auth/login`
+Principal portão de validação de sessões. É restrito agressivamente aos filtros *Rate-Limiter* prevenindo ataques de dicionários brutos analisados via IP.
 
-### Pagamentos e Acordos (`/api/Agreements`)
-- `POST /formalize`: Gatilho principal para gerar boleto ou iniciar pagamentos via PIX. Conta com proteção *Distributed Locking* baseada em Redis.
-- `GET /billet/{id}`: Rota que devolve o IFRAME source e os headers de proxy corretos para exibição sem base64 leaks.
+**Estrutura de Entrada (JSON Payload):**
+```json
+{
+  "email": "admin@system.local",
+  "password": "Admin@12345_Str0ng"
+}
+```
 
-## Rate Limiting e Payload Restrictions
-O sistema garante escalabilidade segurando payloads imensos. Requisições maiores que o tamanho permitido (geralmente poucos megabytes) e fluxos massivos de IPs não confiáveis levam a um imediato `429 Too Many Requests`.
+**Retorno Base (200 OK + Extratos de `Set-Cookie` Headers):**
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "data": {
+    "accessToken": "eyJhbG...", // Evaporado no front e armazenado seguidamente sob Cookies do Browser.
+    "userName": "Administrador Plataforma",
+    "roles": ["Admin", "Super"]
+  }
+}
+```
+
+## 2. Gestão Administrativa Logs/Auditoria (`/api/AdminPanel`)
+
+Bloqueio terminal operando dentro da lógica cega do pipeline do `.NET RouteProtectionMiddleware`. Apenas níveis super-usuários transitam.
+
+### `GET /api/AdminPanel/logs?page=1&limit=25`
+Varre detalhadamente trilhas de auditoria contendo marcas inalteráveis de IPs formatados assimetricamente de operários sistêmicos.
+
+**Extrato de Matriz Respondida (200 OK):**
+```json
+{
+  "totalItems": 1599,
+  "currentPage": 1,
+  "items": [
+    {
+      "id": "e434cd...",
+      "timestamp": "2024-03-01T15:00:23Z",
+      "level": "Warning",
+      "message": "Operador tentou violar travamento.",
+      "maskedIp": "192.168.***.***",
+      "userId": "90fe-421..."
+    }
+  ]
+}
+```
+
+## 3. Formalização Operatória de Dívidas (`/api/Agreements`)
+
+Conjuntos orquestrando pesadas ações que amarram motores distribuídos em Memória RAM (Redis) finalizando na prensa de documentos QuestPDF.
+
+### `POST /api/Agreements/formalize`
+Requisições pesadas que englobam exclusividade matemática e retração para finalização de acordos.
+
+**Demanda Estrutural:**
+```json
+{
+  "contractId": "bca8b789-54d1...",
+  "paymentMethod": "PIX_BILLET",
+  "agreedTotalValue": 1055.99
+}
+```
+
+**Reação a Gatilho Simultaneou Falso (409 Conflict):**
+```json
+{
+  "success": false,
+  "errors": {
+    "message": "Formalização correndo na retaguarda. Acordo sob o mesmo identificador encontra-se devidamente travado!"
+  }
+}
+```
+
+## 4. Retorno Desacoplado Visual (Boleteria)
+
+### `GET /api/Agreements/billet/{id}`
+Fornece chaves curtas e pontuais para acesso temporário (Pre-Signed AWS Mocks no S3) re-inseridas perante `Iframes` fechados, evadindo com mestria as gigantes lentidões ao se enviar dados textuais puros carregados engolindo bytes da camada backender sob formatos lentos de Array ou Base64.
