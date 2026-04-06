@@ -1,19 +1,19 @@
 {
   "site": {
-    "name": "invoice-generator-c",
+    "name": "Git Pages Docs",
     "defaultLanguage": "en",
     "supportedLanguages": [
       "en",
       "pt",
       "es"
     ],
-    "HideThemeSelector": true,
-    "ThemeDefault": "github-dark",
+    "HideThemeSelector": false,
+    "ThemeDefault": "aurora-dark",
     "ThemeModeDefault": "dark",
     "ActiveNavigation": true,
     "FocusMode": true,
     "FooterEnabled": true,
-    "FooterLinkName": "invoice-generator-c",
+    "FooterLinkName": "GitPageDocs",
     "FooterLinkUrl": "https://github.com/vidigal-code/invoice-generator-c",
     "FooterDateMode": "browser",
     "FooterDateCustom": "",
@@ -120,12 +120,12 @@
     "IconNavMenuBlockInactiveImgHeight": 20,
     "RouteguideBrandPositionDefault": "center",
     "RouteguideBrandContainerTopDefault": false,
-    "audioPlayerEnabled": false,
+    "audioPlayerEnabled": true,
     "audioAutoPlayOnLoad": false,
     "audioLoopEnabled": false,
     "audioSequentialPlayback": false,
     "audioPopoverHideSource": false,
-    "audioPopoverShowMinutes": false,
+    "audioPopoverShowMinutes": true,
     "audioTracks": [
       {
         "url": "https://www.youtube.com/watch?v=xAR6N9N8e6U",
@@ -347,6 +347,28 @@
         "path": "gitpagedocs/docs/versions/1.0.0/config.json",
         "ProjectLink": "https://github.com/vidigal-code/invoice-generator-c",
         "PathConfig": "gitpagedocs/docs/versions/1.0.0/config.json",
+        "PreviewProject": "",
+        "UpdateDate": "",
+        "branch": "",
+        "release": "",
+        "commit": ""
+      },
+      {
+        "id": "1.1.0",
+        "path": "gitpagedocs/docs/versions/1.1.0/config.json",
+        "ProjectLink": "https://github.com/vidigal-code/invoice-generator-c",
+        "PathConfig": "gitpagedocs/docs/versions/1.1.0/config.json",
+        "PreviewProject": "",
+        "UpdateDate": "",
+        "branch": "",
+        "release": "",
+        "commit": ""
+      },
+      {
+        "id": "1.1.1",
+        "path": "gitpagedocs/docs/versions/1.1.1/config.json",
+        "ProjectLink": "https://github.com/vidigal-code/invoice-generator-c",
+        "PathConfig": "gitpagedocs/docs/versions/1.1.1/config.json",
         "PreviewProject": "",
         "UpdateDate": "",
         "branch": "",
