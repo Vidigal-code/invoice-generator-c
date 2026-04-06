@@ -1,16 +1,108 @@
 services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+
+  db-init:
+    image: mcr.microsoft.com/mssql-tools
+    depends_on:
+      sqlserver:
+        condition: service_started
+    command: >
+      bash -c "sleep 15s && /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P $${DB_PASSWORD} -d master -i /setup/init.sql"
+    volumes:
+      - ./docker/sql:/setup
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
+
   api:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: ./Dockerfile
     ports:
-      - "8080:8080"
+      - "${BACKEND_HOST_PORT:-5283}:${BACKEND_CONTAINER_PORT:-8080}"
     env_file:
       - path: .env
         required: false
     environment:
-      ASPNETCORE_URLS: http://+:8080
-      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: "http://+:${BACKEND_CONTAINER_PORT:-8080}"
+      ASPNETCORE_ENVIRONMENT: ${ENVIRONMENT:-Production}
+      Logging__LogLevel__Default: ${LOGGING_LEVEL:-Information}
+      Security__MaxPayloadMb: ${SECURITY_MAX_PAYLOAD_MB:-10}
+      Security__RequestTimeoutSeconds: ${SECURITY_REQUEST_TIMEOUT_SECONDS:-10}
+      Security__CorsOrigins: ${CORS_ALLOWED_ORIGINS:-http://localhost}
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=InvoiceGeneratorC;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True;"
+      JwtSettings__Secret: ${JWT_SECRET}
+      JwtSettings__JweSecret: ${JWE_SECRET}
+      AdminSettings__Username: ${ADMIN_USERNAME}
+      AdminSettings__Email: ${ADMIN_EMAIL}
+      AdminSettings__Password: ${ADMIN_PASSWORD}
+      RateLimit__Permits: ${RATE_LIMIT_PERMITS:-100}
+      RateLimit__Queue: ${RATE_LIMIT_QUEUE:-2}
+      RateLimit__WindowMinutes: ${RATE_LIMIT_WINDOW_MINUTES:-1}
+      Redis__ConnectionString: ${REDIS_CONNECTION}
+      RabbitMQ__Host: ${RABBITMQ_HOST}
+      RabbitMQ__Username: ${RABBITMQ_USER}
+      RabbitMQ__Password: ${RABBITMQ_PASS}
+      ElasticSearch__Uri: ${ELASTICSEARCH_URI}
+      AWS__S3__AccessKey: ${AWS_ACCESS_KEY_ID}
+      AWS__S3__SecretKey: ${AWS_SECRET_ACCESS_KEY}
+      AWS__S3__ServiceURL: ${AWS_ENDPOINT_URL}
+      AWS__S3__BucketName: ${AWS_S3_BUCKET}
+    depends_on:
+      - sqlserver
+      - redis
+      - rabbitmq
+      - elasticsearch
+      - localstack
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    container_name: invoice_redis
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: invoice_rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  elasticsearch:
+    image: elasticsearch:8.13.0
+    container_name: invoice_elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+
+  localstack:
+    image: localstack/localstack:3.4.0
+    container_name: invoice_localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - AWS_DEFAULT_REGION=${AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - LOCALSTACK_ACKNOWLEDGE_ACCOUNT_REQUIREMENT=1
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
 
   frontend:
     build:
@@ -20,6 +112,48 @@ services:
         ANGULAR_API_URL: /api
         ANGULAR_APP_TITLE: Invoice Generator
     ports:
-      - "8081:80"
+      - "${FRONTEND_HOST_PORT:-8081}:${FRONTEND_CONTAINER_PORT:-80}"
     depends_on:
       - api
+
+  # ========================================================
+  # TDD ORCHESTRATORS (Run via docker-compose --profile test up)
+  # ========================================================
+  backend-test:
+    image: mcr.microsoft.com/dotnet/sdk:9.0
+    container_name: invoice_backend_tdd
+    profiles: ["test"]
+    working_dir: /app/backend
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - JWT_SECRET=test_jwt_secret_mock_long_enough_2026!
+      - JWE_SECRET=test_jwe_secret_mock_long_enough_and_very_secure_for_tests_2026!
+      - ELASTICSEARCH_URI=http://elasticsearch:9200
+      - AWS_ENDPOINT_URL=http://localstack:4566
+    depends_on:
+      - sqlserver
+      - redis
+      - rabbitmq
+      - elasticsearch
+      - localstack
+    command: >
+      bash -c "echo 'Iniciando Suíte Genérica de Testes XUnit TDD...' &&
+               dotnet test --verbosity normal"
+
+  frontend-test:
+    image: trion/ng-cli-karma:17.0.0
+    container_name: invoice_frontend_tdd
+    profiles: ["test"]
+    working_dir: /app/frontend
+    volumes:
+      - ./frontend:/app/frontend
+    environment:
+      - CHROME_BIN=/usr/bin/google-chrome
+    command: >
+      bash -c "echo 'Inicializando Ambiente Angular Jasmine/Karma...' &&
+               npm install &&
+               npm run test -- --watch=false --browsers=ChromeHeadless"
+
+volumes:
+  sqlserver_data:
