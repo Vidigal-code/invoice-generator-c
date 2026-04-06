@@ -1,40 +1,54 @@
-# Primeiros passos
+# Primeiros Passos
 
-Este guia leva o projeto do zero ate docs rodando.
+Bem-vindo à documentação oficial do **Invoice Generator C**.
 
-## Pre-requisitos
+Esta plataforma corporativa é um sistema completo de cálculo de dívidas, formalização de acordos e gestão com recursos avançados de auditoria e segurança.
 
-- Node.js 20+
-- npm 10+ (ou pnpm)
+## Pré-requisitos
 
-## Setup local
+Para executar o projeto, você precisará de:
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [Node.js 18+](https://nodejs.org/) e Angular CLI 17+
+- [Docker e Docker Compose](https://www.docker.com/)
 
-1. Instale dependencias:
-   - `npm install`
-2. Gere/atualize os artefatos de docs:
-   - `npm run gitpagedocs`
-3. Inicie o desenvolvimento:
-   - `npm run dev`
-4. Build e execucao local de producao:
-   - `npm run build`
-   - `npm start`
+## Instalação e Execução (Docker)
 
-## Comportamento da CLI
+A forma mais fácil de rodar o projeto localmente com todos os seus serviços dependentes (SQL Server, Redis, RabbitMQ, LocalStack S3) é utilizando o Docker Compose.
 
-`npx gitpagedocs` (ou `npm run gitpagedocs`) gera os artefatos na pasta oficial `gitpagedocs/`.
+```bash
+# Clone o repositório
+git clone https://github.com/vidigal-code/invoice-generator-c.git
+cd invoice-generator-c
 
-- Gera somente markdown/json
-- Nao gera `index.html`
-- Nao gera `index.js`
-- Nao executa comandos de instalacao
+# Suba a infraestrutura completa via Docker
+docker-compose up -d
+```
 
-## Modo de busca por repositorio
+Acesse os serviços:
+- **Painel Frontend**: http://localhost:8081
+- **API Swagger/ReDoc**: http://localhost:8081/swagger
+- **RabbitMQ Management**: http://localhost:15672
 
-No ambiente local, o controle e por variavel:
+## Variáveis de Ambiente Essenciais
 
-- `GITPAGEDOCS_REPOSITORY_SEARCH=true`
-- `GITPAGEDOCS_REPOSITORY_SEARCH=false`
+As seguintes variáveis configuram o ambiente em `appsettings.json` ou variáveis do Docker:
+- `ConnectionStrings:DefaultConnection`: Conexão ao SQL Server.
+- `Security:CorsOrigins`: Origens frontend permitidas para evitar bloqueio CORS.
+- `AdminSettings:AdminEmail` / `AdminSettings:AdminPassword`: Credenciais do primeiro administrador no Seed do sistema.
 
-Em build de GitHub Pages (`GITHUB_ACTIONS=true`), a busca de repositorio fica sempre ativa.
+## Scripts npm e Comandos .NET
 
-> Versao: 1.0.0
+**Backend:**
+```bash
+cd backend
+dotnet restore
+dotnet build
+dotnet run --environment Development
+```
+
+**Frontend:**
+```bash
+cd frontend
+npm install
+npm start
+```
