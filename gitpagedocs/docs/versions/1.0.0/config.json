@@ -253,6 +253,117 @@
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
       "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 7,
+      "title": {
+        "pt": "Esquema do BD",
+        "en": "Database Schema",
+        "es": "Esquema de BD"
+      },
+      "description": {
+        "pt": "Diagrama de Entidade-Relacionamento",
+        "en": "Entity-Relationship Diagrams",
+        "es": "Diagrama de Entidad Relacion"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/database-schema.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/database-schema.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/database-schema.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 8,
+      "title": {
+        "pt": "Segurança e Auditoria",
+        "en": "Security & Audit",
+        "es": "Seguridad y Auditoria"
+      },
+      "description": {
+        "pt": "IP Masking e Rate Limiting",
+        "en": "IP Masking and Rate Limiting",
+        "es": "IP Masking e Rate Limiting"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/security-and-audit.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/security-and-audit.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/security-and-audit.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 9,
+      "title": {
+        "pt": "Mensageria e Filas",
+        "en": "Queue Management",
+        "es": "Mensajes y Colas"
+      },
+      "description": {
+        "pt": "Padrões assíncronos via RabbitMQ",
+        "en": "Asynchronous messaging with RabbitMQ",
+        "es": "Patrones vía RabbitMQ"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/queue-management.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/queue-management.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/queue-management.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
     }
   ],
   "menus-header-md": [
@@ -344,6 +455,51 @@
       "es": {
         "title": "Deploy",
         "path-click": "gitpagedocs/docs/versions/1.0.0/es/deployment-guide.md"
+      }
+    },
+    {
+      "id": 7,
+      "pt": {
+        "title": "BD",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/database-schema.md"
+      },
+      "en": {
+        "title": "DB Schema",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/database-schema.md"
+      },
+      "es": {
+        "title": "BD",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/database-schema.md"
+      }
+    },
+    {
+      "id": 8,
+      "pt": {
+        "title": "Segurança",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/security-and-audit.md"
+      },
+      "en": {
+        "title": "Security",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/security-and-audit.md"
+      },
+      "es": {
+        "title": "Seguridad",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/security-and-audit.md"
+      }
+    },
+    {
+      "id": 9,
+      "pt": {
+        "title": "Filas/RMQ",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/queue-management.md"
+      },
+      "en": {
+        "title": "Queues",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/queue-management.md"
+      },
+      "es": {
+        "title": "Colas RMQ",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/queue-management.md"
       }
     }
   ],
