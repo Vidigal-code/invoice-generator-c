@@ -4,26 +4,72 @@
 <details>
 <summary><strong>View Details</strong></summary>
 
-Welcome to **invoice-generator-c**, an enterprise-grade Debt Simulation & Agreement Formalization White-Label platform. This repository contains a full-stack monolithic-scaled solution, strictly decoupled through Docker containers.
+Welcome to **invoice-generator-c**, an enterprise-style **debt simulation and agreement formalization** white-label platform. The repo is a **full-stack monorepo**: **ASP.NET Core 9** API, **Angular 19** SPA, and **SQL Server**, orchestrated with **Docker Compose** so services stay isolated in containers.
 
-### 🏛 Architecture Overview
-- **Backend (.NET 9 C#):** Hosted in the `/backend` directory. Conceived around **Clean Architecture**, **DDD (Domain-Driven Design)**, and **CQRS (via MediatR)**. Includes high-tier security protocols such as Anti-DDoS Rate Limiting, strict CSPs, unit-of-work state management, and HttpOnly Secure Cookies for authentication. It features comprehensive TDD coverage (Unit and Integration testing using Moq and xUnit).
-- **Frontend (Angular 22):** Hosted in the `/frontend` directory. Built under a Standalone component-based architecture emphasizing high scalability. It implements reactive state management via **Signals and RxJS**, wrapped in a 100% responsive **Dark Blue** layout driven by Angular Material.
-- **Database (SQL Server):** Fully containerized using `docker-compose.yml`, initialized seamlessly via an SQL tracking script.
+### Architecture overview
 
-**Quick Start:** `docker compose up --build`
+**Backend (`/backend`)** — logical **Clean Architecture** split into physical folders:
+
+| Layer | Responsibility |
+|--------|----------------|
+| **API** | HTTP controllers, filters (`ApiResponseFilter`), middleware (exceptions, security headers, audit, rate limiting helpers), `HttpCurrentUserAccessor` |
+| **Application** | CQRS with **MediatR** (commands/queries/handlers), **FluentValidation** (+ pipeline `ValidationBehavior`), domain services (auth, contracts, admin, billets, debt strategies), DTOs, MassTransit **consumer** (`AgreementFormalizedConsumer`) |
+| **Domain** | Entities (users, contracts, agreements, billets, audit, etc.), value rules (e.g. CPF), role names |
+| **Infrastructure** | **EF Core** + SQL Server (`AppDbContext`, repositories, **unit of work**), **Redis** (distributed cache + **distributed locks**), **S3-compatible** storage (encrypted payload wrapper + AES-GCM protector), configuration binding |
+
+Cross-cutting in **`Program.cs`**: **Serilog** (rolling file; optional **Elasticsearch** sink), **JWT Bearer** with token read from **HttpOnly** `AuthToken` cookie and **JWE** decryption key, global **rate limiting**, request timeouts, Kestrel body limits, **CORS** with credentials, **Polly** resilience on `HttpClient`, **Swagger + Swagger UI** and **OpenAPI** in Development/Production. On startup the API uses **`Database.EnsureCreatedAsync`** (no checked-in migrations) plus optional **demo contract seeding**; the **`db-init`** service runs **`docker/sql/init.sql`** against SQL Server.
+
+**Frontend (`/frontend`)** — **Angular 19** (standalone components, **Angular Material**). Layout:
+
+- **`core/`** — guards, interceptors (JWT, credentials + **`X-Correlation-ID`**), API services, validators, date adapter, constants  
+- **`features/`** — `home`, `auth` (login/register), `dashboard` (incl. billet viewer), `admin` (logs, dialogs)  
+- **`shared/`** — layout shell, navbar, footer, reusable UI  
+- **`state/`** — shared application state  
+
+**Docker Compose (`docker-compose.yml`)** — typical stack:
+
+- **sqlserver** + **db-init** (SQL bootstrap from `./docker/sql`)  
+- **api** (backend image)  
+- **frontend** (nginx-served Angular build)  
+- **redis**, **rabbitmq** (MassTransit), **elasticsearch** (optional logs), **localstack** (S3 API for local/dev)  
+
+Optional **TDD profiles**: `docker compose --profile test up` runs **backend-test** (`dotnet test`) and **frontend-test** (`ng test` headless).
+
+**Quick start:** configure root **`.env`** (see **`.env.example`**), then:
+
+```bash
+docker compose up --build
+```
+
 </details>
 
 ## 🇧🇷 Descrição em Português
 <details>
 <summary><strong>Ver Detalhes</strong></summary>
 
-Bem-vindo ao **invoice-generator-c**, uma plataforma corporativa e White-Label para Simulação de Dívidas e Formalização de Acordos. Este repositório entrega uma solução ponta-a-ponta robusta, dissociada por containeres Docker.
+Bem-vindo ao **invoice-generator-c**, plataforma **white-label** para **simulação de dívidas** e **formalização de acordos**. O repositório é um **monorepo full-stack**: API **ASP.NET Core 9**, SPA **Angular 19** e **SQL Server**, orquestrados com **Docker Compose**.
 
-### 🏛 Orquestração da Arquitetura
-- **Backend (.NET 9 C#):** Localizado no diretório `/backend`. Arquitetado com **Clean Architecture**, **DDD (Domain-Driven Design)** e **CQRS (via MediatR)** para separação pura de obrigações (SOLID). Incorpora defesas rigorosas como Limitadores de Taxa Anti-DDoS (Rate Limiting), HSTS (Strict-Transport-Security), Cookies de Autenticação *HttpOnly* (blindando proteção contra roubos de sessão) e design fortemente fundamentado por Testes Ágeis Integrados e Unitários (TDD puro com Moq/xUnit). Conta com uma Trilha de Auditoria (AuditLog DLP) automatizada capaz de mascarar dados sensíveis PII por Regex e gerar rastreios transacionais por IPs. Todo o ecossistema C# utiliza Comentários em Bloco JSDoc Bilíngues (EN/PT) integrados ao container do **Dual Swagger UI**.
-- **Frontend (Angular 22):** Encontrado em `/frontend`. Construído em cima do arquétipo de Componentes Standalone com a máxima otimização reativa extraída de **Signals e RxJS**. Apresenta rastreabilidade HTTP fortemente alicerçada via comentários block JSDoc nativos. Dispõe de uma experiência de tela com tema "Azul Escuro", puramente responsiva à diferentes resoluções via Flex e Menus dinâmicos de tipo Hambúrguer. Implanta cabeçalhos autônomos `X-Correlation-ID` em cada requisição para alimentar as matrizes de rastreio da API.
-- **Banco de Dados (SQL Server):** Orquestrado instantaneamente através de imagens em `docker-compose`, dispensando as instalações vitais de ambiente para dev.
+### Visão da arquitetura
 
-**Inicio Rápido:** `docker compose up --build`
+**Backend (`/backend`)** — **Clean Architecture** refletida em pastas:
+
+| Camada | Função |
+|--------|--------|
+| **API** | Controllers HTTP, filtros, middlewares (erro, headers, auditoria, rate limit), acesso ao utilizador atual |
+| **Application** | **CQRS** com **MediatR**, **FluentValidation**, serviços de aplicação, DTOs, consumidor **MassTransit** para eventos de acordo |
+| **Domain** | Entidades, regras (ex.: CPF), papéis |
+| **Infrastructure** | **EF Core** + SQL Server, **Redis** (cache e locks), armazenamento estilo **S3** com camada de encriptação |
+
+O **`Program.cs`** integra **Serilog** (ficheiro; opcional **Elasticsearch**), **JWT** lido de cookie **HttpOnly** com suporte **JWE**, **rate limiting**, timeouts, **CORS** com credenciais, **Polly**, **Swagger/Swagger UI** e **OpenAPI**. A base de dados é criada com **`EnsureCreatedAsync`** (sem migrações versionadas no repo); o serviço **`db-init`** executa **`docker/sql/init.sql`**.
+
+**Frontend (`/frontend`)** — **Angular 19**, componentes **standalone** e **Material**. Estrutura: **`core/`** (guards, interceptors com **`X-Correlation-ID`**, serviços HTTP), **`features/`** (home, auth, dashboard, admin), **`shared/`**, **`state/`**.
+
+**Docker Compose** inclui **SQL Server**, **API**, **frontend**, **Redis**, **RabbitMQ**, **Elasticsearch** e **LocalStack** (S3). Perfil **`test`** para **xUnit** e **Karma** em CI local.
+
+**Início rápido:** configurar **`.env`** na raiz (ver **`.env.example`**), depois:
+
+```bash
+docker compose up --build
+```
+
 </details>
