@@ -8,7 +8,7 @@ This is the **ASP.NET Core 9** API for **invoice-generator-c**. The codebase fol
 
 ### Layer map
 
-- **`API/`** — MVC controllers (`Auth`, `Contracts`, `Debt`, `Agreements`, `Billets`, `AdminPanel`), **`ApiResponseFilter`**, middleware (`ExceptionMiddleware`, `SecurityHeadersMiddleware`, `AuditLogMiddleware`, `DatadogDummyMiddleware`), correlation id propagation, PII masking on logged request bodies for non-GET traffic.  
+- **`API/`** — MVC controllers (`Auth`, `Contracts`, `Debt`, `Agreements`, `Billets`, `AdminPanel`), **`ApiResponseFilter`**, **`OpenApi/`** (English + pt-BR copy, `IDocumentFilter`, cookie-auth `IOperationFilter`, `/docs` landing HTML), middleware (`ExceptionMiddleware`, `SecurityHeadersMiddleware`, `AuditLogMiddleware`, `DatadogDummyMiddleware`), correlation id propagation, PII masking on logged request bodies for non-GET traffic.  
 - **`Application/`** — commands/queries/handlers, validators, auth and contract services, debt calculation strategy, billet PDF/HTML/barcode services, admin panel service, **`AuditService`** (implements `IAuditService`; encrypts IP for structured audit writes).  
 - **`Domain/`** — entities, enums, repository and unit-of-work **interfaces**, CPF validation.  
 - **`Infrastructure/`** — `AppDbContext`, generic repository + **unit of work**, **Redis** distributed lock, **S3** file storage + **AES-GCM** payload protection, **`AppSettings`** binding.  
@@ -23,12 +23,14 @@ This is the **ASP.NET Core 9** API for **invoice-generator-c**. The codebase fol
 - **Authorization** — role policies (e.g. formalize agreements).  
 - **Observability** — **Serilog** to console + rolling file; optional **Elasticsearch** sink if `ElasticSearch:Uri` is set.  
 - **Resilience** — named **`HttpClient`** with **Polly** standard handler.  
-- **API docs** — **Swagger Gen** (XML comments when present) + **Swagger UI**; **OpenAPI** mapped in Development and Production.  
+- **API docs** — **Swashbuckle** generates **`v1-en`** and **`v1-br`** with localized summaries/tags; **Swagger UI** at `/docs/en/swagger` and `/docs/br/swagger`; **ReDoc** (`Swashbuckle.AspNetCore.ReDoc`) at `/docs/en/redoc` and `/docs/br/redoc`; hub **`/docs`**; JSON at `/swagger/v1-en/swagger.json` and `/swagger/v1-br/swagger.json`. **Microsoft.AspNetCore.OpenAPI** `MapOpenApi()` remains. XML comments still enrich schemas. **SecurityHeadersMiddleware** skips strict CSP for `/swagger`, `/docs`, and `/openapi`.  
 - **Database** — **`EnsureCreatedAsync`** at startup + role/admin seed + optional **`ContractDemoSeed`** (skipped in integration test environment).
 
 ### How to run
 
 From the repository root, **`docker compose up --build`** starts SQL Server (with **`docker/sql/init.sql`** via **`db-init`**), Redis, RabbitMQ, Elasticsearch, LocalStack, the **api** service, and the **frontend** container. For local **`dotnet run`**, set connection strings and secrets to match **`appsettings.Development.json`** / environment variables (Redis, RabbitMQ, JWT/JWE, CORS, logging path, etc.).
+
+**Interactive docs in Docker:** open **`http://localhost:<BACKEND_HOST_PORT>/docs`** (default **5283** unless overridden). In Swagger, call **`POST /api/Auth/login`** first so the browser stores the **`AuthToken`** cookie for protected endpoints.
 
 To run tests in Docker: **`docker compose --profile test up`** (see compose file for **`backend-test`**).
 
@@ -42,7 +44,7 @@ API **ASP.NET Core 9** do **invoice-generator-c**, organizada em **Clean Archite
 
 ### Camadas
 
-- **`API/`** — Controllers, filtro de resposta uniforme, middlewares (exceções, cabeçalhos de segurança, auditoria com **mascaramento de PII** em payloads registados).  
+- **`API/`** — Controllers, filtro de resposta, pasta **`OpenApi/`** (textos EN / pt-BR, filtros Swashbuckle, página **`/docs`**), middlewares (exceções, cabeçalhos, auditoria com **mascaramento de PII**).  
 - **`Application/`** — comandos/consultas, serviços (autenticação, contratos, dívidas, boletos, admin), **`AuditService`**.  
 - **`Domain/`** — entidades, interfaces de repositório e **unit of work**, validações de domínio.  
 - **`Infrastructure/`** — **EF Core**, **Redis**, armazenamento **S3**, proteção de ficheiros.  
@@ -50,7 +52,7 @@ API **ASP.NET Core 9** do **invoice-generator-c**, organizada em **Clean Archite
 
 ### Arranque
 
-**Serilog** (consola + ficheiro; **Elasticsearch** opcional), **JWT** em cookie **HttpOnly** com **JWE**, **MassTransit** + **RabbitMQ**, **Redis**, limitação de taxa global, **Swagger UI** e **OpenAPI**. Esquema criado com **`EnsureCreatedAsync`** (sem migrações EF versionadas no repositório).
+**Serilog** (consola + ficheiro; **Elasticsearch** opcional), **JWT** em cookie **HttpOnly** com **JWE**, **MassTransit** + **RabbitMQ**, **Redis**, limitação de taxa global, **documentação OpenAPI em inglês e pt-BR** (**Swagger UI** + **ReDoc**, índice **`/docs`**). Esquema criado com **`EnsureCreatedAsync`** (sem migrações EF versionadas no repositório).
 
 ### Execução
 

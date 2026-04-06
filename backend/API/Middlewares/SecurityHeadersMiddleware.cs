@@ -13,6 +13,15 @@ namespace InvoiceGenerator.Api.API.Middlewares
 
         public async Task InvokeAsync(HttpContext context, AppSettings appSettings)
         {
+            var path = context.Request.Path.Value ?? string.Empty;
+            if (path.StartsWith("/swagger", StringComparison.OrdinalIgnoreCase)
+                || path.StartsWith("/docs", StringComparison.OrdinalIgnoreCase)
+                || path.StartsWith("/openapi", StringComparison.OrdinalIgnoreCase))
+            {
+                await _next(context);
+                return;
+            }
+
             var allowedOrigins = string.IsNullOrEmpty(appSettings.Security.CorsOrigins) 
                 ? "'self'" 
                 : string.Join(" ", appSettings.Security.CorsOrigins.Split(","));

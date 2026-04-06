@@ -17,7 +17,20 @@ Welcome to **invoice-generator-c**, an enterprise-style **debt simulation and ag
 | **Domain** | Entities (users, contracts, agreements, billets, audit, etc.), value rules (e.g. CPF), role names |
 | **Infrastructure** | **EF Core** + SQL Server (`AppDbContext`, repositories, **unit of work**), **Redis** (distributed cache + **distributed locks**), **S3-compatible** storage (encrypted payload wrapper + AES-GCM protector), configuration binding |
 
-Cross-cutting in **`Program.cs`**: **Serilog** (rolling file; optional **Elasticsearch** sink), **JWT Bearer** with token read from **HttpOnly** `AuthToken` cookie and **JWE** decryption key, global **rate limiting**, request timeouts, Kestrel body limits, **CORS** with credentials, **Polly** resilience on `HttpClient`, **Swagger + Swagger UI** and **OpenAPI** in Development/Production. On startup the API uses **`Database.EnsureCreatedAsync`** (no checked-in migrations) plus optional **demo contract seeding**; the **`db-init`** service runs **`docker/sql/init.sql`** against SQL Server.
+Cross-cutting in **`Program.cs`**: **Serilog** (rolling file; optional **Elasticsearch** sink), **JWT Bearer** with token read from **HttpOnly** `AuthToken` cookie and **JWE** decryption key, global **rate limiting**, request timeouts, Kestrel body limits, **CORS** with credentials, **Polly** resilience on `HttpClient`, **OpenAPI** (`MapOpenApi`), and **dual-language API reference** in Development/Production: OpenAPI **`v1-en`** (English) and **`v1-br`** (Brazilian Portuguese), each with **Swagger UI** and **ReDoc**, plus hub **`/docs`**. CSP is relaxed on `/docs`, `/swagger`, and `/openapi` so bundled documentation UIs load. On startup the API uses **`Database.EnsureCreatedAsync`** (no checked-in migrations) plus optional **demo contract seeding**; the **`db-init`** service runs **`docker/sql/init.sql`** against SQL Server.
+
+### API documentation (same host as the API — works in Docker)
+
+| Resource | Path |
+|----------|------|
+| Hub | `/docs` |
+| Swagger UI (English) | `/docs/en/swagger` |
+| Swagger UI (pt-BR) | `/docs/br/swagger` |
+| ReDoc (English) | `/docs/en/redoc` |
+| ReDoc (pt-BR) | `/docs/br/redoc` |
+| OpenAPI JSON | `/swagger/v1-en/swagger.json`, `/swagger/v1-br/swagger.json` |
+
+Use the **`api`** service port from Compose (e.g. **`http://localhost:5283`** if `BACKEND_HOST_PORT` is default).
 
 **Frontend (`/frontend`)** — **Angular 19** (standalone components, **Angular Material**). Layout:
 
@@ -60,7 +73,20 @@ Bem-vindo ao **invoice-generator-c**, plataforma **white-label** para **simulaç
 | **Domain** | Entidades, regras (ex.: CPF), papéis |
 | **Infrastructure** | **EF Core** + SQL Server, **Redis** (cache e locks), armazenamento estilo **S3** com camada de encriptação |
 
-O **`Program.cs`** integra **Serilog** (ficheiro; opcional **Elasticsearch**), **JWT** lido de cookie **HttpOnly** com suporte **JWE**, **rate limiting**, timeouts, **CORS** com credenciais, **Polly**, **Swagger/Swagger UI** e **OpenAPI**. A base de dados é criada com **`EnsureCreatedAsync`** (sem migrações versionadas no repo); o serviço **`db-init`** executa **`docker/sql/init.sql`**.
+O **`Program.cs`** integra **Serilog** (ficheiro; opcional **Elasticsearch**), **JWT** em cookie **HttpOnly** com **JWE**, **rate limiting**, timeouts, **CORS**, **Polly**, **OpenAPI** e **documentação em inglês e pt-BR** (`v1-en`, `v1-br`): **Swagger UI** e **ReDoc**, índice **`/docs`**, ficheiros em **`API/OpenApi/`**, CSP flexível em `/docs` e `/swagger`. Base de dados com **`EnsureCreatedAsync`**; **`db-init`** executa **`docker/sql/init.sql`**.
+
+### Documentação da API (Docker)
+
+| Recurso | Caminho |
+|---------|---------|
+| Índice | `/docs` |
+| Swagger (inglês) | `/docs/en/swagger` |
+| Swagger (pt-BR) | `/docs/br/swagger` |
+| ReDoc (inglês) | `/docs/en/redoc` |
+| ReDoc (pt-BR) | `/docs/br/redoc` |
+| JSON OpenAPI | `/swagger/v1-en/swagger.json`, `/swagger/v1-br/swagger.json` |
+
+Porta do serviço **`api`** no Compose (ex.: **`http://localhost:5283`**).
 
 **Frontend (`/frontend`)** — **Angular 19**, componentes **standalone** e **Material**. Estrutura: **`core/`** (guards, interceptors com **`X-Correlation-ID`**, serviços HTTP), **`features/`** (home, auth, dashboard, admin), **`shared/`**, **`state/`**.
 

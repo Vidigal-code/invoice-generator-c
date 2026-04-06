@@ -21,6 +21,7 @@ The **Angular 19** SPA for **invoice-generator-c**. The app uses **standalone co
 - **Environments:** `src/environments/`; **`npm run sync-env`** (via `scripts/sync-env-from-root.mjs`) copies variables from the **monorepo root** `.env` before **`ng serve`** / **`ng build`**.  
 - **Tests:** **Karma** + **Jasmine** (`npm run test`); specs under `src/tests/` (unit + integration-style component tests).  
 - **Container:** production image builds the app and serves static files with **nginx** (see `Dockerfile` and `nginx-frontend.conf`); Compose passes build args such as API base URL.
+- **API reference (Swagger / ReDoc):** served by the backend on the **api** container host and port (not the Angular dev server), e.g. **`http://localhost:5283/docs`** with English and pt-BR UIs under `/docs/en/*` and `/docs/br/*`.
 
 ### How to run
 
@@ -51,6 +52,8 @@ SPA **Angular 19** do **invoice-generator-c**, com **componentes standalone**, *
 ### Ferramentas
 
 Versões em **`package.json`** (Angular **19.2**). Script **`sync-env`** sincroniza o **`.env`** da **raiz do monorepo** antes de **`ng serve`** / **`ng build`**. Testes com **Karma/Jasmine**; imagem **Docker** com **nginx** em produção.
+
+**Documentação OpenAPI (Swagger / ReDoc)** fica no serviço **api** do Compose (porta publicada, ex. **`http://localhost:5283/docs`**) — inglês e pt-BR em `/docs/en/*` e `/docs/br/*`.
 
 ### Execução
 

@@ -29,7 +29,10 @@ using InvoiceGenerator.Api.Infrastructure.Security;
 using InvoiceGenerator.Api.Infrastructure.Data;
 using FluentValidation;
 using System.Threading.RateLimiting;
+using System.Reflection;
 using MediatR;
+using InvoiceGenerator.Api.API.OpenApi;
+using Swashbuckle.AspNetCore.ReDoc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -131,19 +134,33 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo 
-    { 
-        Title = "Invoice Generator API (en/pt)", 
-        Version = "v1",
-        Description = "Documentation for the multi-lingual Invoice endpoints"
-    });
-    
-    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, xmlFile);
-    if (System.IO.File.Exists(xmlPath))
+    c.SwaggerDoc(OpenApiDocumentNames.V1En, OpenApiTranslationData.GetApiInfo(OpenApiDocumentNames.V1En));
+    c.SwaggerDoc(OpenApiDocumentNames.V1Br, OpenApiTranslationData.GetApiInfo(OpenApiDocumentNames.V1Br));
+    c.DocInclusionPredicate((documentName, _) =>
+        documentName is OpenApiDocumentNames.V1En or OpenApiDocumentNames.V1Br);
+
+    c.CustomOperationIds(apiDesc =>
     {
+        var controller = apiDesc.ActionDescriptor.RouteValues.TryGetValue("controller", out var cv) ? cv : "Api";
+        var action = apiDesc.ActionDescriptor.RouteValues.TryGetValue("action", out var av) ? av : "Action";
+        return $"{controller}_{action}";
+    });
+
+    c.AddSecurityDefinition(OpenApiCookieAuthOperationFilter.SecuritySchemeId, new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        In = Microsoft.OpenApi.Models.ParameterLocation.Cookie,
+        Name = "AuthToken",
+        Description = "HttpOnly cookie set by POST /api/Auth/login (JWT; JWE per server config)."
+    });
+
+    c.OperationFilter<OpenApiCookieAuthOperationFilter>();
+    c.DocumentFilter<OpenApiBilingualDocumentFilter>();
+
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
         c.IncludeXmlComments(xmlPath);
-    }
 });
 
 builder.Services.AddControllers(options =>
@@ -365,14 +382,39 @@ webApp.UseMiddleware<DatadogDummyMiddleware>();
 webApp.UseMiddleware<AuditLogMiddleware>();
 
 
-if (webApp.Environment.IsDevelopment() || webApp.Environment.IsProduction()) 
+if (webApp.Environment.IsDevelopment() || webApp.Environment.IsProduction())
 {
     webApp.MapOpenApi();
-    webApp.UseSwagger();
+
+    webApp.UseSwagger(c => c.RouteTemplate = "swagger/{documentName}/swagger.json");
+
     webApp.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Invoice Generator API (en/pt)");
+        c.RoutePrefix = "docs/en/swagger";
+        c.DocumentTitle = "Invoice Generator API — Swagger (English)";
+        c.SwaggerEndpoint($"/swagger/{OpenApiDocumentNames.V1En}/swagger.json", "OpenAPI v1 (English)");
     });
+    webApp.UseSwaggerUI(c =>
+    {
+        c.RoutePrefix = "docs/br/swagger";
+        c.DocumentTitle = "Invoice Generator API — Swagger (pt-BR)";
+        c.SwaggerEndpoint($"/swagger/{OpenApiDocumentNames.V1Br}/swagger.json", "OpenAPI v1 (Português Brasil)");
+    });
+
+    webApp.UseReDoc(c =>
+    {
+        c.RoutePrefix = "docs/en/redoc";
+        c.DocumentTitle = "Invoice Generator API — ReDoc (English)";
+        c.SpecUrl($"/swagger/{OpenApiDocumentNames.V1En}/swagger.json");
+    });
+    webApp.UseReDoc(c =>
+    {
+        c.RoutePrefix = "docs/br/redoc";
+        c.DocumentTitle = "Invoice Generator API — ReDoc (pt-BR)";
+        c.SpecUrl($"/swagger/{OpenApiDocumentNames.V1Br}/swagger.json");
+    });
+
+    webApp.MapGet("/docs", () => Results.Content(OpenApiDocsLandingPage.Html, "text/html; charset=utf-8"));
 }
 
 webApp.UseCors("AllowFrontend");
