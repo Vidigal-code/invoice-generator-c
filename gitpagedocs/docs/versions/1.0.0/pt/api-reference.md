@@ -1,87 +1,64 @@
-# Especificações Rigorosas da API REST
+# Referência da API
 
-A **Invoice Generator C** estipula rotas em pleno acordo às diretrizes severas de RESTful.
+Aplicação de contratos de cobrança, cálculo de dívida, negociação de acordos e emissão de documentos de parcelas. O backend é C#/.NET, apesar do sufixo -c. Boletos e códigos gerados têm caráter demonstrativo: a formalização não registra cobrança em banco nem confirma pagamento bancário.
 
-## 1. Camada de Autenticação Central (`/api/Auth`)
+## Fluxo e casos de falha
 
-A imersão primária requisita aperto de mão (handshake) retornando _encapsuladores HttpOnly Cookies_.
+1. Cadastro → validação de senha/usuário → hash de senha → login → JWT e cookie HttpOnly/Secure/SameSite=Strict. O login também devolve Token no JSON. Controllers e ContractAccessService aplicam papéis e acesso ao contrato. Administração de usuários e contratos fica em AdminPanel; o catálogo HTTP está na referência.
 
-### `POST /api/Auth/login`
-Principal portão de validação de sessões. É restrito agressivamente aos filtros *Rate-Limiter* prevenindo ataques de dicionários brutos analisados via IP.
+2. Contrato → parcelas → cálculo por carteira. Para cada parcela, diasEmAtraso=max(0, dataReferência-dataVencimento); multa=principal×percentual/100 apenas se atrasada; juros=principal×(taxaMensal/100/diasPorMês)×diasEmAtraso. As taxas vêm de AppSettings; diasPorMês recai em 30 quando inválido. CurrentValue soma principal, multa e juros. A query usa cache e respeita acesso ao contrato.
 
-**Estrutura de Entrada (JSON Payload):**
-```json
-{
-  "email": "admin@system.local",
-  "password": "Admin@12345_Str0ng"
-}
+3. Formalização valida de 1 a 24 parcelas, adquire Redis formalize:{contractId} por 45 segundos, verifica acesso e acordo ativo. Trava indisponível retorna 409; acordo ativo retorna 400. Gera Agreement e Billets, divide o valor com arredondamento a duas casas e vencimentos em intervalos de 30 dias. QuestPDF gera PDFs no próprio handler, antes da publicação do evento.
+
+4. Cada PDF segue ao adaptador de armazenamento; se o upload falha, o handler grava uma URL mock. O contrato muda para Negotiated e publica AgreementFormalizedEvent. O consumer invalida o cache de dívida e grava idem:agreement:{id} no Redis por 30 dias; ele não gera os PDFs. A consulta de boleto verifica acesso e tenta recuperar o PDF, com fallback HTML conforme o serviço.
+
+5. GenericRepository.AddAsync e UpdateAsync chamam SaveChangesAsync imediatamente. Agreement é persistido antes do loop de PDFs, cada Billet após seu upload e o contrato antes do evento. Não há transação envolvendo a formalização inteira; uma falha intermediária pode deixar acordo ou parcelas parciais. Confira o estado persistido antes de tentar novamente.
+
+| Método e caminho | Declaração |
+| --- | --- |
+| `DELETE /api/Contracts/{id:guid}` | [backend/API/Controllers/ContractsController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/ContractsController.cs) |
+| `GET /api/AdminPanel/agreement-actions` | [backend/API/Controllers/AdminPanelController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/AdminPanelController.cs) |
+| `GET /api/AdminPanel/audit-logs` | [backend/API/Controllers/AdminPanelController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/AdminPanelController.cs) |
+| `GET /api/AdminPanel/login-events` | [backend/API/Controllers/AdminPanelController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/AdminPanelController.cs) |
+| `GET /api/AdminPanel/logs` | [backend/API/Controllers/AdminPanelController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/AdminPanelController.cs) |
+| `GET /api/AdminPanel/roles` | [backend/API/Controllers/AdminPanelController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/AdminPanelController.cs) |
+| `GET /api/AdminPanel/users` | [backend/API/Controllers/AdminPanelController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/AdminPanelController.cs) |
+| `GET /api/Agreements/history` | [backend/API/Controllers/AgreementsController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/AgreementsController.cs) |
+| `GET /api/Billets/{billetId}/pdf` | [backend/API/Controllers/BilletsController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/BilletsController.cs) |
+| `GET /api/Contracts/{id:guid}/history` | [backend/API/Controllers/ContractsController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/ContractsController.cs) |
+| `GET /api/Contracts/{id:guid}` | [backend/API/Controllers/ContractsController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/ContractsController.cs) |
+| `GET /api/Contracts` | [backend/API/Controllers/ContractsController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/ContractsController.cs) |
+| `GET /api/Debt/{contractId}/calculate` | [backend/API/Controllers/DebtController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/DebtController.cs) |
+| `POST /api/AdminPanel/users/{id:guid}/reset-password` | [backend/API/Controllers/AdminPanelController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/AdminPanelController.cs) |
+| `POST /api/Agreements` | [backend/API/Controllers/AgreementsController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/AgreementsController.cs) |
+| `POST /api/Auth/login` | [backend/API/Controllers/AuthController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/AuthController.cs) |
+| `POST /api/Auth/register` | [backend/API/Controllers/AuthController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/AuthController.cs) |
+| `POST /api/Contracts` | [backend/API/Controllers/ContractsController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/ContractsController.cs) |
+| `PUT /api/AdminPanel/users/{id:guid}` | [backend/API/Controllers/AdminPanelController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/AdminPanelController.cs) |
+| `PUT /api/Contracts/{id:guid}` | [backend/API/Controllers/ContractsController.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/API/Controllers/ContractsController.cs) |
+
+## Exemplo de requisição
+
+```http
+POST /api/Agreements HTTP/1.1
+Authorization: Bearer <access-token>
+Content-Type: application/json
+
+{"contractId":"00000000-0000-4000-8000-000000000001","negotiatedValue":1200.00,"installmentsCount":12}
 ```
 
-**Retorno Base (200 OK + Extratos de `Set-Cookie` Headers):**
-```json
-{
-  "success": true,
-  "statusCode": 200,
-  "data": {
-    "accessToken": "eyJhbG...", // Evaporado no front e armazenado seguidamente sob Cookies do Browser.
-    "userName": "Administrador Plataforma",
-    "roles": ["Admin", "Super"]
-  }
-}
-```
+## Arquivos relacionados
 
-## 2. Gestão Administrativa Logs/Auditoria (`/api/AdminPanel`)
+- [backend/Application/Commands/CreateAgreementCommandHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Commands/CreateAgreementCommandHandler.cs)
+- [backend/Application/Consumers/AgreementFormalizedConsumer.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Consumers/AgreementFormalizedConsumer.cs)
+- [backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs)
+- [backend/Application/Services/Contracts/ContractAccessService.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Services/Contracts/ContractAccessService.cs)
+- [backend/Application/Queries/GetBilletPdfQueryHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Queries/GetBilletPdfQueryHandler.cs)
+- [backend/Infrastructure/Configuration/AppSettings.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Configuration/AppSettings.cs)
+- [docker-compose.yml](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/docker-compose.yml)
+- [backend/Infrastructure/Repositories/GenericRepository.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Repositories/GenericRepository.cs)
 
-Bloqueio terminal operando dentro da lógica cega do pipeline do `.NET RouteProtectionMiddleware`. Apenas níveis super-usuários transitam.
+## Navegação
 
-### `GET /api/AdminPanel/logs?page=1&limit=25`
-Varre detalhadamente trilhas de auditoria contendo marcas inalteráveis de IPs formatados assimetricamente de operários sistêmicos.
-
-**Extrato de Matriz Respondida (200 OK):**
-```json
-{
-  "totalItems": 1599,
-  "currentPage": 1,
-  "items": [
-    {
-      "id": "e434cd...",
-      "timestamp": "2024-03-01T15:00:23Z",
-      "level": "Warning",
-      "message": "Operador tentou violar travamento.",
-      "maskedIp": "192.168.***.***",
-      "userId": "90fe-421..."
-    }
-  ]
-}
-```
-
-## 3. Formalização Operatória de Dívidas (`/api/Agreements`)
-
-Conjuntos orquestrando pesadas ações que amarram motores distribuídos em Memória RAM (Redis) finalizando na prensa de documentos QuestPDF.
-
-### `POST /api/Agreements/formalize`
-Requisições pesadas que englobam exclusividade matemática e retração para finalização de acordos.
-
-**Demanda Estrutural:**
-```json
-{
-  "contractId": "bca8b789-54d1...",
-  "paymentMethod": "PIX_BILLET",
-  "agreedTotalValue": 1055.99
-}
-```
-
-**Reação a Gatilho Simultaneou Falso (409 Conflict):**
-```json
-{
-  "success": false,
-  "errors": {
-    "message": "Formalização correndo na retaguarda. Acordo sob o mesmo identificador encontra-se devidamente travado!"
-  }
-}
-```
-
-## 4. Retorno Desacoplado Visual (Boleteria)
-
-### `GET /api/Agreements/billet/{id}`
-Fornece chaves curtas e pontuais para acesso temporário (Pre-Signed AWS Mocks no S3) re-inseridas perante `Iframes` fechados, evadindo com mestria as gigantes lentidões ao se enviar dados textuais puros carregados engolindo bytes da camada backender sob formatos lentos de Array ou Base64.
+- [Project guide](?menu=pt&lang=pt&id=19)
+- [Source reference](?menu=pt&lang=pt&id=20)

@@ -1,31 +1,31 @@
-# Queue Operations & Messaging
+# Queue Management
 
-Background decoupling heavily isolates bottlenecks within **Invoice Generator C**. A system reliant purely on synchronous HTTP loops crashes easily anticipating intensive document rendering.
+Application for collection contracts, debt calculation, agreement negotiation and installment documents. The backend is C#/.NET despite the -c suffix. Generated payment slips/codes are demonstrative: formalization does not register a bank charge or confirm bank payment.
 
-## 1. Engine Infrastructure (RabbitMQ & MassTransit)
+## Workflow and failure cases
 
-We combine `RabbitMQ` alongside the extreme versatility of the `MassTransit` libraries wrapping the configuration abstractions natively avoiding tedious boilerplate loops.
+1. Registration → password/user validation → password hashing → login → JWT and HttpOnly/Secure/SameSite=Strict cookie. Login also returns Token in JSON. Controllers and ContractAccessService enforce roles and contract access. AdminPanel handles user/contract administration; the HTTP catalog is in the reference.
 
-- **Publisher Extractor**: When `Agreements/formalize` hits its endpoint and bypasses Redis Lock constraints, its main purpose concludes immediately dropping a structured JSON event payload blindly towards the RabbitMQ broker before pushing HTTP `200 OK`. No synchronous delays wait rendering limits.
+2. Contract → installments → portfolio-specific calculation. Per installment, daysOverdue=max(0, referenceDate-dueDate); penalty=principal×percent/100 only when overdue; interest=principal×(monthlyRate/100/daysPerMonth)×daysOverdue. Rates come from AppSettings; invalid daysPerMonth falls back to 30. CurrentValue sums principal, penalty and interest. The query uses cache and checks contract access.
 
-## 2. Event Ecosystem Workflow
+3. Formalization validates 1–24 installments, acquires Redis formalize:{contractId} for 45 seconds and checks access/active agreements. Lock failure returns 409; an active agreement returns 400. It creates Agreement/Billets, divides the amount rounded to two decimals and uses 30-day due-date intervals. QuestPDF generates PDFs in the handler before event publication.
 
-The standard event topology is built surrounding highly descriptive naming schemas representing the core state changing.
+4. Each PDF goes to storage; upload failure makes the handler store a mock URL. The contract becomes Negotiated and publishes AgreementFormalizedEvent. The consumer invalidates the debt cache and records idem:agreement:{id} in Redis for 30 days; it does not generate PDFs. Payment-slip queries check access and attempt PDF retrieval with an HTML fallback in the service.
 
-```mermaid
-journey
-    title The Asynchronous Lifetime of an Event
-    section Emission Path
-      API Handlre (Success): 5: Backend Layer
-      Broker Asserts Event 'AgreementFormalizedEvent': 3: RabbitMQ Hub
-    section Consumption Branch 
-      Queue Consumer 'AgreementSub-Q1' Wakes Up: 4: MassTransit Thread
-      Generates Billet via QuestPDF Engine: 2: Memory Load Array
-      Uploads Output Target explicitly onto S3 Mock: 4: Isolated Storage Call
-      Re-flags SQL Entity into Confirmed/Finalized: 5: DB Update
-```
+5. GenericRepository.AddAsync and UpdateAsync call SaveChangesAsync immediately. Agreement is persisted before the PDF loop, each Billet after upload, and the contract before the event. The entire formalization has no wrapping transaction; intermediate failure can leave a partial agreement/installments. Inspect persisted state before retrying.
 
-## 3. Resilience and Dead-Letter Pipelines
+## Related files
 
-Network spikes or abrupt restarts over DB connections throw catastrophic warnings. Handlers wrapped behind MassTransit inherently invoke structured **retry mechanics**.
-- If a consumer trips parsing exceptions over an event consecutively `X` configured times, `MassTransit` halts loops unconditionally detaching the poisoned payload safely away tossing its schema inside native `_skipped` or `_error` Dead-Letter designated exchange queues holding manual replay capacities later avoiding blockage clashing active queues universally.
+- [backend/Application/Commands/CreateAgreementCommandHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Commands/CreateAgreementCommandHandler.cs)
+- [backend/Application/Consumers/AgreementFormalizedConsumer.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Consumers/AgreementFormalizedConsumer.cs)
+- [backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs)
+- [backend/Application/Services/Contracts/ContractAccessService.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Services/Contracts/ContractAccessService.cs)
+- [backend/Application/Queries/GetBilletPdfQueryHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Queries/GetBilletPdfQueryHandler.cs)
+- [backend/Infrastructure/Configuration/AppSettings.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Configuration/AppSettings.cs)
+- [docker-compose.yml](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/docker-compose.yml)
+- [backend/Infrastructure/Repositories/GenericRepository.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Repositories/GenericRepository.cs)
+
+## Navigation
+
+- [Project guide](?menu=en&lang=en&id=19)
+- [Source reference](?menu=en&lang=en&id=20)

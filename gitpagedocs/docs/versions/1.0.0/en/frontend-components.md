@@ -1,42 +1,38 @@
-# Frontend Deep-Dive
+# Frontend Components
 
-**Invoice Generator C** embraces a fully standalone Angular 17 interface. It is architecturally decoupled keeping component separation rigid across business features.
+Application for collection contracts, debt calculation, agreement negotiation and installment documents. The backend is C#/.NET despite the -c suffix. Generated payment slips/codes are demonstrative: formalization does not register a bank charge or confirm bank payment.
 
-## 1. Sub-Modules Separation
+## UI and state
 
-The routing scheme separates logical areas utilizing native Lazy Loading keeping initial browser payload minuscule:
-- `admin-logs.component` (`/admin`): Contains high-fidelity MatTable lists featuring pagination controls coupled alongside `Subject`-driven Debouncers for massive query strings avoiding API throttling.
-- `dashboard.component` (`/dashboard`): Organises grouped sub-debts. Binds complex loading logic checking for RabbitMQ events dynamically rendering `mat-snack-bar` updates.
-- `billet-viewer.component`: Special child-route bound for secure iframe embeddings tracking blob-like streams fetching presigned PDFs directly over the mocked LocalStack S3 instances securely. 
+ASP.NET Core net9.0 with EF Core 9.0.2/SQL Server, MediatR 14.1, FluentValidation, MassTransit 8.3.1/RabbitMQ, Redis and QuestPDF 2026.2.4; Angular 19.2.19, TypeScript 5.7 and RxJS 7.8 frontend. API, Application, Domain and Infrastructure separate HTTP, commands/queries, entities and adapters. LocalStack can provide S3. SQL, S3 and RabbitMQ do not automatically share a distributed transaction.
 
-## 2. Global Interceptors and Auth Flows
+Core entities: User/Role, Contract/Installment, Agreement/Billet, ContractHistory and AuditLog. Validation uses FluentValidation/domain rules; contract access is shared by queries and formalization. Storage has an AES-GCM payload protector. Payload encryption is not log anonymization. The lock has a fixed expiry; consumer deduplication is check-then-write, not an exactly-once guarantee. Uniform rounding can leave a residual difference between installments and the negotiated total.
 
-Since we opted against exposing raw JWT variables inside local-storage to battle potential XSS infiltrations, our core interceptors merely enforce proper inclusion flags:
+Registration → password/user validation → password hashing → login → JWT and HttpOnly/Secure/SameSite=Strict cookie. Login also returns Token in JSON. Controllers and ContractAccessService enforce roles and contract access. AdminPanel handles user/contract administration; the HTTP catalog is in the reference.
 
-```typescript
-export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const secureReq = req.clone({
-    withCredentials: true // Permits transmission of strictly HttpOnly secured JWT fragments
-  });
-  return next(secureReq);
-};
-```
+## Verified sources
 
-## 3. Sandboxing Billet Downloads
+- [frontend/src/app/app.routes.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/app/app.routes.ts)
+- [frontend/src/app/core/services/api.service.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/app/core/services/api.service.ts)
+- [frontend/src/app/core/services/api/admin-panel-api.service.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/app/core/services/api/admin-panel-api.service.ts)
+- [frontend/src/app/core/services/api/auth-api.service.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/app/core/services/api/auth-api.service.ts)
+- [frontend/src/app/core/services/api/contracts-api.service.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/app/core/services/api/contracts-api.service.ts)
+- [frontend/src/app/core/services/api/debt-agreements-billets-api.service.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/app/core/services/api/debt-agreements-billets-api.service.ts)
+- [frontend/src/app/core/services/notification-dialog.service.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/app/core/services/notification-dialog.service.ts)
+- [frontend/src/app/core/services/theme.service.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/app/core/services/theme.service.ts)
 
-Visualizing the concluded agreements inside the frontend mandates the `sandbox` directive ensuring zero chance malicious scripts leak outside the generated document.
+## Related files
 
-```html
-<iframe
-    [src]="pdfSafeUrl"
-    sandbox="allow-same-origin allow-scripts"
-    [title]="'Contrato'">
-</iframe>
-```
+- [backend/Application/Commands/CreateAgreementCommandHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Commands/CreateAgreementCommandHandler.cs)
+- [backend/Application/Consumers/AgreementFormalizedConsumer.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Consumers/AgreementFormalizedConsumer.cs)
+- [backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs)
+- [backend/Application/Services/Contracts/ContractAccessService.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Services/Contracts/ContractAccessService.cs)
+- [backend/Application/Queries/GetBilletPdfQueryHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Queries/GetBilletPdfQueryHandler.cs)
+- [backend/Infrastructure/Configuration/AppSettings.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Configuration/AppSettings.cs)
+- [docker-compose.yml](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/docker-compose.yml)
+- [backend/Infrastructure/Repositories/GenericRepository.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Repositories/GenericRepository.cs)
 
-## 4. Angular Material Dark Mode
+## Navigation
 
-A critical business constraint demanded a sophisticated dark mode toggle. Inside `styles.scss` the global theme variables wrap deeply across classes overhauling everything:
-- **Mat-Chips**: Adapt to softer colors avoiding burn-outs.
-- **Form Inputs**: Outline colors transition to higher-opacity whites.
-- **Elevation Shadows**: Swap from hard drop shadows into subtle structural separations keeping clarity solid regardless of lighting constraints.
+- [Project guide](?menu=en&lang=en&id=19)
+- [Source reference](?menu=en&lang=en&id=20)

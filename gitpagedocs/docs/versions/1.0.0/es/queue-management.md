@@ -1,31 +1,31 @@
-# Escalamiento Asincrónico mediante Mallas Mensajeras (Queues)
+# Mensajes y Colas
 
-Una barrera insalvable para frenos absolutos frente colas crónicas de petitorios paralelos se logró atajando desacoples asíncronos radicales protegiendo eficientemente a nuestra base llamada **Invoice Generator C**. Aquel entramado estático atrapado incesantemente procesando tiempos prolongados devolviendo repuestas bajo asfixiadas llamadas crudas HTTP morirá y fallará agónicamente ante altas demandas en procesamiento volumétrico transaccional o documentario.
+Aplicación de contratos de cobro, cálculo de deuda, negociación y documentos de cuotas. El backend es C#/.NET pese al sufijo -c. Los documentos y códigos son demostrativos: formalizar no registra un cobro bancario ni confirma un pago.
 
-## 1. El Latido Abierto Desacoplado (RabbitMQ engrasado bajo MassTransit)
+## Flujo y casos de fallo
 
-Ensamblamos vínculos fortificando cimientos atando los conductos `RabbitMQ` recubiertos con innegable fineza instrumental inyectando `MassTransit`. Decretando una nulidad rotunda a establecer enlaces brutos consumiendo ciclos interminables crudos evitando fugas infinitas por la persistencia e intervenciones sobre conductos y flujos puros.
+1. Registro → validación de contraseña/usuario → hash → login → JWT y cookie HttpOnly/Secure/SameSite=Strict. Login también devuelve Token en JSON. Controllers y ContractAccessService aplican roles y acceso al contrato. AdminPanel administra usuarios/contratos; el catálogo HTTP está en la referencia.
 
-- **Eyector Pícaro e Instintivo (Event Publisher)**: Una vez los dominios englobados tras barreras Redis se vencen permitiendo formalizaciones limpias en `Agreements/formalize`, todo trabajo síncrono agotador y complejo detiene su participación, delegando cargas estructuradas ciegas atadas en cargas al transportador puro. Un estado inmediato de soltura HTTP devuelve confortantemente visiones operacionales liberadas bajo repuesta 200 librando al CPU de colapsar la memoria principal rindiendo documentos o llamadas en base. 
+2. Contrato → cuotas → cálculo por cartera. Por cuota, díasAtraso=max(0, fechaReferencia-vencimiento); multa=principal×porcentaje/100 solo con atraso; interés=principal×(tasaMensual/100/díasMes)×díasAtraso. Las tasas vienen de AppSettings; díasMes inválido usa 30. CurrentValue suma principal, multa e interés. La query usa caché y comprueba acceso.
 
-## 2. Mapa Interactivo Sublevante (Workflow de Disparos)
+3. La formalización valida 1–24 cuotas, adquiere Redis formalize:{contractId} durante 45 segundos y comprueba acceso/acuerdos activos. Fallo de bloqueo: 409; acuerdo activo: 400. Crea Agreement/Billets, divide el valor redondeando a dos decimales y fija vencimientos cada 30 días. QuestPDF genera los PDFs en el handler antes del evento.
 
-Los mensajes abrazan arquitecturas definidas con vocería clara representando tránsitos del comportamiento transformado dictados rigurosos en lenguajes simples y concretos indicando fin de tareas pasadas.
+4. Cada PDF va al almacenamiento; si falla el upload, el handler guarda una URL mock. El contrato pasa a Negotiated y publica AgreementFormalizedEvent. El consumer invalida caché de deuda y guarda idem:agreement:{id} en Redis durante 30 días; no genera PDFs. La consulta verifica acceso e intenta recuperar PDF con fallback HTML.
 
-```mermaid
-journey
-    title Trayectorias de Viaje Interrumpido en Cascada Asíncrona (Acontecimiento)
-    section Etapa Del Expulsor Desprendido
-      Controlador Asesta Validación Segura Absoluta: 5: Ensamble .NET 
-      Plataforma Broker Asimila Acontecer 'AgreementFormalizedEvent': 3: Panel Físico RMQ 
-    section Vertiente Operacional Externa Concluyente
-      Agente Receptor De Rueda De Cola Despierta 'AgreementSub-Q1': 4: Flujo Reactivo MassTransit 
-      Tallador En Blanco Asimila Edictos Hacia Formatos PDF Puros: 2: Asilamiento Matemático Libre
-      Depositario Encíptico Reposa Documentos Virtuales Sobre Nuve S3 Aws: 4: Encapsulamiento Férreo Almacén Constante
-      Tratante Sella Vículo Histórico Definitivamente Sincronizado O "Formalizado": 5: Registro Transaccionalmente Consolidado
-```
+5. GenericRepository.AddAsync y UpdateAsync llaman SaveChangesAsync inmediatamente. Agreement se guarda antes del bucle PDF, cada Billet después del upload y el contrato antes del evento. No existe transacción global de formalización; un fallo puede dejar acuerdo/cuotas parciales. Inspeccione estado antes de repetir.
 
-## 3. Barreras Defensivas Auto-Reparables y Repositorios Nulos
+## Archivos relacionados
 
-Los golpes abruptos o cataclismos originados en tiempos ciegos por la sub-capa red de Bases o S3 ocasionan catástrofes mortales para rutinas transaccionales paralelas en crudo. Aquellos agentes oídos adosados inmersamente incrustados cobrando beneficios orgánicos envueltos atreves del ecosistema puro provisto generosamente derivado del sistema reactivo _MassTransit_ adoptan mecánicas auto-recuperables blindadas bajo estrategias probadas por _Reintentos Pasivos Controlados_ retardados exponencialmente (Retries).
-- Al verse atascado orgánicamente aquel recibidor, estrellándose destructiva y consecutivamente asediado a causa de componentes nulos caídos en formatos irreconocibles topando un umbral preestablecido estricto `X` reiteradas re-lanzadas. El guardián supremo interfiere atenuar caos infinitos y encadena férreo aísla perimetralmente asilando al evento mortal desterrado, acunándolo silenciado hacia contenedores muertos denominados apartadamente "_Colas Sepulcros o Dead Letters_" posibilitando así redimirlos en futuros ensayos humanos reparados sin obstruir ni taponar los tubos transitorios maestros operacionales de otros eventos puros funcionales sanos circulando de fondo.
+- [backend/Application/Commands/CreateAgreementCommandHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Commands/CreateAgreementCommandHandler.cs)
+- [backend/Application/Consumers/AgreementFormalizedConsumer.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Consumers/AgreementFormalizedConsumer.cs)
+- [backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs)
+- [backend/Application/Services/Contracts/ContractAccessService.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Services/Contracts/ContractAccessService.cs)
+- [backend/Application/Queries/GetBilletPdfQueryHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Queries/GetBilletPdfQueryHandler.cs)
+- [backend/Infrastructure/Configuration/AppSettings.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Configuration/AppSettings.cs)
+- [docker-compose.yml](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/docker-compose.yml)
+- [backend/Infrastructure/Repositories/GenericRepository.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Repositories/GenericRepository.cs)
+
+## Navegación
+
+- [Project guide](?menu=es&lang=es&id=19)
+- [Source reference](?menu=es&lang=es&id=20)

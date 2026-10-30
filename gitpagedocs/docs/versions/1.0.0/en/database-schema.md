@@ -1,58 +1,143 @@
-# Database Schema and Relationships
+# Database Schema
 
-**Invoice Generator C** handles rigorous financial entity relationships ensuring traceability. Built atop `Entity Framework Core`, the database enforces strict navigational properties.
+Application for collection contracts, debt calculation, agreement negotiation and installment documents. The backend is C#/.NET despite the -c suffix. Generated payment slips/codes are demonstrative: formalization does not register a bank charge or confirm bank payment.
 
-## Relational Entity-Resource Diagram
+## Data contracts
 
-```mermaid
-erDiagram
-    TENANT ||--o{ USER : manages
-    TENANT ||--o{ DEBT : issues
-    DEBT ||--|{ PORTFOLIO : contains
-    DEBT ||--o{ CONTRACT : generates
-    CONTRACT ||--|{ CONTRACT_HISTORY : registers
-    USER ||--o{ AUDIT_LOG : tracks
-    
-    TENANT {
-        uuid Id PK
-        string Name
-        string CNPJ "Unique Index"
-    }
-    
-    DEBT {
-        uuid Id PK
-        uuid TenantId FK
-        decimal GrossAmount
-        datetime CreatedAt
-        boolean IsFormalized
-    }
-    
-    CONTRACT {
-        uuid Id PK
-        uuid DebtId FK
-        string PaymentMethod
-        decimal ApprovedValue
-        datetime FormalizationDate
-    }
-    
-    CONTRACT_HISTORY {
-        uuid Id PK
-        uuid ContractId FK
-        string Action "Enum (Created, Paid, Locked)"
-        datetime Timestamp
-    }
-    
-    AUDIT_LOG {
-        uuid Id PK
-        uuid UserId FK
-        string Endpoint
-        string MaskedIP "AES-256 encrypted suffix"
-        string JsonPayload "Anonymized payload"
-    }
-```
+Core entities: User/Role, Contract/Installment, Agreement/Billet, ContractHistory and AuditLog. Validation uses FluentValidation/domain rules; contract access is shared by queries and formalization. Storage has an AES-GCM payload protector. Payload encryption is not log anonymization. The lock has a fixed expiry; consumer deduplication is check-then-write, not an exactly-once guarantee. Uniform rounding can leave a residual difference between installments and the negotiated total.
 
-## Entity Framework Behavior
+### Agreement
 
-- **Lazy Loading is Disabled**: To prevent N+1 connection storms, EF Core strictly mandates `.Include()` query structures when hydrating parent-child contexts (e.g., pulling `Contract` and fetching its appended `ContractHistory` nodes).
-- **Audit Interceptors**: EF Core Interceptors inject implicit fields like `CreatedAt` and `UpdatedAt` right before committing changes onto the execution pipeline. 
-- **Soft Deletions**: Financial records are never truly purged (`DELETE FROM`). Operations toggle an internal structural `IsActive` or `DeletedAt` timestamp, rendering records oblivious to typical queries unless explicitly searched through Admin panels.
+[backend/Domain/Entities/Agreement.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Domain/Entities/Agreement.cs)
+
+| Field | Type |
+| --- | --- |
+| `ContractId` | `Guid` |
+| `TotalNegotiatedValue` | `decimal` |
+| `InstallmentsCount` | `int` |
+| `Status` | `InvoiceGenerator.Api.Domain.Enums.AgreementStatus` |
+| `Contract` | `Contract?` |
+| `Billets` | `ICollection<Billet>` |
+
+### AuditLog
+
+[backend/Domain/Entities/AuditLog.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Domain/Entities/AuditLog.cs)
+
+| Field | Type |
+| --- | --- |
+| `UserId` | `Guid?` |
+| `Action` | `string` |
+| `EntityName` | `string` |
+| `EntityId` | `string?` |
+| `OldValues` | `string?` |
+| `NewValues` | `string?` |
+| `IpAddress` | `string?` |
+
+### BaseEntity
+
+[backend/Domain/Entities/BaseEntity.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Domain/Entities/BaseEntity.cs)
+
+| Field | Type |
+| --- | --- |
+| `Id` | `Guid` |
+| `CreatedAt` | `DateTime` |
+| `UpdatedAt` | `DateTime?` |
+
+### Billet
+
+[backend/Domain/Entities/Billet.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Domain/Entities/Billet.cs)
+
+| Field | Type |
+| --- | --- |
+| `AgreementId` | `Guid` |
+| `InstallmentNumber` | `int` |
+| `DueDate` | `DateTime` |
+| `Value` | `decimal` |
+| `Barcode` | `string` |
+| `PdfUrl` | `string?` |
+| `Status` | `InvoiceGenerator.Api.Domain.Enums.BilletStatus` |
+| `Agreement` | `Agreement?` |
+
+### Contract
+
+[backend/Domain/Entities/Contract.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Domain/Entities/Contract.cs)
+
+| Field | Type |
+| --- | --- |
+| `OwnerUserId` | `Guid?` |
+| `OwnerUser` | `User?` |
+| `ContractNumber` | `string` |
+| `DebtorName` | `string` |
+| `DebtorDocument` | `string` |
+| `OriginalValue` | `decimal` |
+| `CurrentBalance` | `decimal` |
+| `Portfolio` | `InvoiceGenerator.Api.Domain.Enums.WalletPortfolio` |
+| `Status` | `InvoiceGenerator.Api.Domain.Enums.ContractStatus` |
+| `Installments` | `ICollection<Installment>` |
+| `Agreements` | `ICollection<Agreement>` |
+
+### ContractHistory
+
+[backend/Domain/Entities/ContractHistory.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Domain/Entities/ContractHistory.cs)
+
+| Field | Type |
+| --- | --- |
+| `ContractId` | `Guid` |
+| `ChangedByUserId` | `Guid?` |
+| `ChangeType` | `string` |
+| `PayloadJson` | `string` |
+| `Contract` | `Contract?` |
+
+### Installment
+
+[backend/Domain/Entities/Installment.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Domain/Entities/Installment.cs)
+
+| Field | Type |
+| --- | --- |
+| `ContractId` | `Guid` |
+| `InstallmentNumber` | `int` |
+| `DueDate` | `DateTime` |
+| `OriginalValue` | `decimal` |
+| `CurrentValue` | `decimal` |
+| `Status` | `InvoiceGenerator.Api.Domain.Enums.InstallmentStatus` |
+| `Contract` | `Contract?` |
+
+### Role
+
+[backend/Domain/Entities/Role.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Domain/Entities/Role.cs)
+
+| Field | Type |
+| --- | --- |
+| `Name` | `string` |
+| `Description` | `string?` |
+| `Users` | `ICollection<User>` |
+
+### User
+
+[backend/Domain/Entities/User.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Domain/Entities/User.cs)
+
+| Field | Type |
+| --- | --- |
+| `RoleId` | `Guid` |
+| `Username` | `string` |
+| `PasswordHash` | `string` |
+| `Email` | `string` |
+| `IsActive` | `bool` |
+| `Role` | `Role?` |
+| `OwnedContracts` | `ICollection<Contract>` |
+
+## Related files
+
+- [backend/Application/Commands/CreateAgreementCommandHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Commands/CreateAgreementCommandHandler.cs)
+- [backend/Application/Consumers/AgreementFormalizedConsumer.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Consumers/AgreementFormalizedConsumer.cs)
+- [backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs)
+- [backend/Application/Services/Contracts/ContractAccessService.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Services/Contracts/ContractAccessService.cs)
+- [backend/Application/Queries/GetBilletPdfQueryHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Queries/GetBilletPdfQueryHandler.cs)
+- [backend/Infrastructure/Configuration/AppSettings.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Configuration/AppSettings.cs)
+- [docker-compose.yml](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/docker-compose.yml)
+- [backend/Infrastructure/Repositories/GenericRepository.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Repositories/GenericRepository.cs)
+
+## Navigation
+
+- [Project guide](?menu=en&lang=en&id=19)
+- [Source reference](?menu=en&lang=en&id=20)

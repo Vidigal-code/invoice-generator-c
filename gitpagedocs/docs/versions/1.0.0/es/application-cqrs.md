@@ -1,14 +1,45 @@
-# Capa de Aplicación y CQRS
+# Aplicación y CQRS
 
-La capa de **Aplicación** define el flujo de trabajo del negocio y la orquestación, sirviendo como puente entre las peticiones API/UI y las restricciones de Dominio.
+Aplicación de contratos de cobro, cálculo de deuda, negociación y documentos de cuotas. El backend es C#/.NET pese al sufijo -c. Los documentos y códigos son demostrativos: formalizar no registra un cobro bancario ni confirma un pago.
 
-## Patrón CQRS
-Se sigue rigurosamente el paradigma CQRS:
-- **Commands (Comandos)**: Encapsulan todas las operaciones que modifican el estado de la aplicación. Gestionados eficientemente vía MediatR.
-- **Queries (Consultas)**: Operaciones de solo lectura que entregan conjuntos de datos optimizados, sin desencadenar efectos secundarios.
+## Comportamiento implementado
 
-## Validaciones
-- **FluentValidation**: Implementado a través de "Pipeline Behaviors" en MediatR. Impide que las peticiones que no cumplan los criterios formales superen la entrada a la capa de Aplicación, devolviendo rápidamente una excepción o mensaje `BadRequest`.
+ASP.NET Core net9.0 con EF Core 9.0.2/SQL Server, MediatR 14.1, FluentValidation, MassTransit 8.3.1/RabbitMQ, Redis y QuestPDF 2026.2.4; frontend Angular 19.2.19, TypeScript 5.7 y RxJS 7.8. API, Application, Domain e Infrastructure separan HTTP, comandos/queries, entidades y adaptadores. LocalStack puede ofrecer S3. SQL, S3 y RabbitMQ no comparten automáticamente una transacción distribuida.
 
-## Consumidores de Mensajería
-- **MassTransit Consumers**: Clases receptoras (`IConsumer<T>`) procesan tareas asíncronas masivas en este nivel, atendiendo eventos lógicos como notificaciones de facturas terminadas o registros en las trazas de auditoría.
+```mermaid
+sequenceDiagram
+  participant UI as Angular
+  participant API as Agreement handler
+  participant R as Redis
+  participant DB as SQL Server
+  participant S as S3
+  participant Q as RabbitMQ
+  UI->>API: Formalize agreement
+  API->>R: Acquire 45s lease
+  API->>DB: Check contract and active agreement
+  API->>DB: Save agreement
+  loop Each installment
+    API->>S: Generate and upload PDF
+    API->>DB: Save billet
+  end
+  API->>DB: Save contract status
+  API->>Q: AgreementFormalizedEvent
+  Q->>R: Consumer invalidates debt cache
+  API-->>UI: Agreement DTO
+```
+
+## Archivos relacionados
+
+- [backend/Application/Commands/CreateAgreementCommandHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Commands/CreateAgreementCommandHandler.cs)
+- [backend/Application/Consumers/AgreementFormalizedConsumer.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Consumers/AgreementFormalizedConsumer.cs)
+- [backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs)
+- [backend/Application/Services/Contracts/ContractAccessService.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Services/Contracts/ContractAccessService.cs)
+- [backend/Application/Queries/GetBilletPdfQueryHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Queries/GetBilletPdfQueryHandler.cs)
+- [backend/Infrastructure/Configuration/AppSettings.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Configuration/AppSettings.cs)
+- [docker-compose.yml](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/docker-compose.yml)
+- [backend/Infrastructure/Repositories/GenericRepository.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Repositories/GenericRepository.cs)
+
+## Navegación
+
+- [Project guide](?menu=es&lang=es&id=19)
+- [Source reference](?menu=es&lang=es&id=20)

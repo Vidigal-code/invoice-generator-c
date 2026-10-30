@@ -52,6 +52,34 @@
   },
   "routes-md": [
     {
+      "id": 19,
+      "title": {
+        "pt": "Contexto e fluxos do projeto",
+        "en": "Project context and workflows",
+        "es": "Contexto y flujos del proyecto"
+      },
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/project-guide.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/project-guide.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/project-guide.md"
+      },
+      "fullscreenEnabled": true
+    },
+    {
+      "id": 20,
+      "title": {
+        "pt": "Referência do código",
+        "en": "Source reference",
+        "es": "Referencia del código"
+      },
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/source-reference.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/source-reference.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/source-reference.md"
+      },
+      "fullscreenEnabled": true
+    },
+    {
       "id": 1,
       "title": {
         "pt": "Primeiros Passos",
@@ -59,9 +87,9 @@
         "es": "Primeros Pasos"
       },
       "description": {
-        "pt": "Ambiente, instalação e inicialização",
-        "en": "Environment, installation and startup",
-        "es": "Entorno, instalación y arranque"
+        "pt": "Primeiros Passos",
+        "en": "Getting Started",
+        "es": "Primeros Pasos"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -96,9 +124,9 @@
         "es": "Visión General de la Arquitectura"
       },
       "description": {
-        "pt": "Estrutura do Backend e Frontend",
-        "en": "Backend and Frontend structure",
-        "es": "Estructura del Backend y Frontend"
+        "pt": "Visão Geral da Arquitetura",
+        "en": "Architecture Overview",
+        "es": "Visión General de la Arquitectura"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -133,9 +161,9 @@
         "es": "Reglas de Negocio"
       },
       "description": {
-        "pt": "Contratos, cálculos de dívida e formalização",
-        "en": "Contracts, debt calculations and formalization",
-        "es": "Contratos, cálculos de deuda y formalización"
+        "pt": "Regras de Negócio",
+        "en": "Business Rules",
+        "es": "Reglas de Negocio"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -170,9 +198,9 @@
         "es": "Referencia de la API"
       },
       "description": {
-        "pt": "Endpoints, autenticação e middlewares",
-        "en": "Endpoints, authentication and middlewares",
-        "es": "Puntos finales, autenticación y middlewares"
+        "pt": "Referência da API",
+        "en": "API Reference",
+        "es": "Referencia de la API"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -207,9 +235,9 @@
         "es": "Componentes del Frontend"
       },
       "description": {
-        "pt": "Angular, Angular Material e visualização de boletos",
-        "en": "Angular, Angular Material and billet visualization",
-        "es": "Angular, Angular Material y visualización de boletos"
+        "pt": "Componentes do Frontend",
+        "en": "Frontend Components",
+        "es": "Componentes del Frontend"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -244,9 +272,9 @@
         "es": "Guía de Despliegue"
       },
       "description": {
-        "pt": "Docker, CI/CD e configuração de produção",
-        "en": "Docker, CI/CD and production configuration",
-        "es": "Docker, CI/CD y configuración de producción"
+        "pt": "Guia de Deploy",
+        "en": "Deployment Guide",
+        "es": "Guía de Despliegue"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -281,9 +309,9 @@
         "es": "Esquema de BD"
       },
       "description": {
-        "pt": "Diagrama de Entidade-Relacionamento",
-        "en": "Entity-Relationship Diagrams",
-        "es": "Diagrama de Entidad Relacion"
+        "pt": "Esquema do BD",
+        "en": "Database Schema",
+        "es": "Esquema de BD"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -318,9 +346,9 @@
         "es": "Seguridad y Auditoria"
       },
       "description": {
-        "pt": "IP Masking e Rate Limiting",
-        "en": "IP Masking and Rate Limiting",
-        "es": "IP Masking e Rate Limiting"
+        "pt": "Segurança e Auditoria",
+        "en": "Security & Audit",
+        "es": "Seguridad y Auditoria"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -355,9 +383,9 @@
         "es": "Mensajes y Colas"
       },
       "description": {
-        "pt": "Padrões assíncronos via RabbitMQ",
-        "en": "Asynchronous messaging with RabbitMQ",
-        "es": "Patrones vía RabbitMQ"
+        "pt": "Mensageria e Filas",
+        "en": "Queue Management",
+        "es": "Mensajes y Colas"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -392,9 +420,9 @@
         "es": "Detalles Backend"
       },
       "description": {
-        "pt": "Arquitetura e módulos",
-        "en": "Architecture and modules",
-        "es": "Arquitectura y módulos"
+        "pt": "Detalhes Backend",
+        "en": "Backend Details",
+        "es": "Detalles Backend"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -429,9 +457,9 @@
         "es": "Detalles Frontend"
       },
       "description": {
-        "pt": "Componentes e Angular",
-        "en": "Components and Angular",
-        "es": "Componentes y Angular"
+        "pt": "Detalhes Frontend",
+        "en": "Frontend Details",
+        "es": "Detalles Frontend"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -466,9 +494,9 @@
         "es": "Infraestructura"
       },
       "description": {
-        "pt": "Acesso a dados e Redis",
-        "en": "Data access and Redis",
-        "es": "Acceso a datos y Redis"
+        "pt": "Infraestrutura",
+        "en": "Infrastructure",
+        "es": "Infraestructura"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -503,9 +531,9 @@
         "es": "Aplicación y CQRS"
       },
       "description": {
-        "pt": "MediatR e FluentValidation",
-        "en": "MediatR and FluentValidation",
-        "es": "MediatR y FluentValidation"
+        "pt": "Aplicação e CQRS",
+        "en": "Application & CQRS",
+        "es": "Aplicación y CQRS"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -540,9 +568,9 @@
         "es": "CI/CD y Despliegue"
       },
       "description": {
-        "pt": "Docker, GitHub Actions",
-        "en": "Docker, GitHub Actions",
-        "es": "Docker, GitHub Actions"
+        "pt": "CI/CD e Deploy",
+        "en": "CI/CD Deployment",
+        "es": "CI/CD y Despliegue"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -577,9 +605,9 @@
         "es": "Entidades de Dominio"
       },
       "description": {
-        "pt": "Modelos Core e DDD",
-        "en": "Core Models and DDD",
-        "es": "Modelos Core y DDD"
+        "pt": "Entidades de Domínio",
+        "en": "Domain Entities",
+        "es": "Entidades de Dominio"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -614,9 +642,9 @@
         "es": "Entorno Local"
       },
       "description": {
-        "pt": "Docker Compose Setup",
-        "en": "Docker Compose Setup",
-        "es": "Configuración Compose"
+        "pt": "Ambiente Local",
+        "en": "Local Environments",
+        "es": "Entorno Local"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -651,9 +679,9 @@
         "es": "Estado Frontend"
       },
       "description": {
-        "pt": "Padrões Reativos",
-        "en": "Reactive Patterns",
-        "es": "Patrones Reactivos"
+        "pt": "Estado do Frontend",
+        "en": "State Management",
+        "es": "Estado Frontend"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -714,10 +742,40 @@
       "RouteguideBrandPosition": "center",
       "RouteguideBrandContainerTop": false,
       "source-viewer": true,
-      "source-viewer-path": "https://github.com/Vidigal-code/invoice-generator-c/tree/HEAD"
+      "source-viewer-path": "https://github.com/Vidigal-code/invoice-generator-c/tree/main"
     }
   ],
   "menus-header-md": [
+    {
+      "id": 19,
+      "pt": {
+        "title": "Contexto e fluxos do projeto",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/project-guide.md"
+      },
+      "en": {
+        "title": "Project context and workflows",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/project-guide.md"
+      },
+      "es": {
+        "title": "Contexto y flujos del proyecto",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/project-guide.md"
+      }
+    },
+    {
+      "id": 20,
+      "pt": {
+        "title": "Referência do código",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/source-reference.md"
+      },
+      "en": {
+        "title": "Source reference",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/source-reference.md"
+      },
+      "es": {
+        "title": "Referencia del código",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/source-reference.md"
+      }
+    },
     {
       "id": 1,
       "pt": {

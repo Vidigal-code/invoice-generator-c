@@ -1,51 +1,45 @@
 # Visão Geral da Arquitetura
 
-**Invoice Generator C** abraça e segue religiosamente o desenho tático de **Clean Architecture** na sua fundação transeunte e em sua face exposta ao utilizador. A base da plataforma tem como alvo principal a excelência e robustez assíncrona, categorizando-se como puro *Cloud-Native*.
+Aplicação de contratos de cobrança, cálculo de dívida, negociação de acordos e emissão de documentos de parcelas. O backend é C#/.NET, apesar do sufixo -c. Boletos e códigos gerados têm caráter demonstrativo: a formalização não registra cobrança em banco nem confirma pagamento bancário.
 
-## Modelo Macro Sistêmico C4 (Contexto)
+## Comportamento implementado
+
+ASP.NET Core net9.0 com EF Core 9.0.2/SQL Server, MediatR 14.1, FluentValidation, MassTransit 8.3.1/RabbitMQ, Redis e QuestPDF 2026.2.4; Angular 19.2.19, TypeScript 5.7 e RxJS 7.8 no frontend. API, Application, Domain e Infrastructure separam HTTP, comandos/queries, entidades e adaptadores. S3 pode ser atendido pelo LocalStack. Não existe garantia automática de transação distribuída entre SQL, S3 e RabbitMQ.
 
 ```mermaid
-C4Context
-    title Diagrama de Contexto (System) - Invoice Generator C
-
-    Person(admin, "Operador do Painel", "Gestor ou analista disparando requisições no painel.")
-    System(igc, "Invoice Generator C", "Controla, formata, formaliza e expede faturas/boletos e histórico de interações.")
-
-    System_Ext(db, "SQL Server", "Estocástico primário relacional e Auditoria.")
-    System_Ext(rmq, "RabbitMQ Broker", "Agendador e retransmissor de tarefas de long-run.")
-    System_Ext(redis, "Redis Cache", "Motor de Trancas Distribuídas rápidas limitando double-clicks.")
-    System_Ext(localstack, "S3 (LocalStack)", "Cofre digital atrelando objetos complexos ou relatórios.")
-    
-    Rel(admin, igc, "Interage sob camada segura HTTPS")
-    Rel(igc, db, "Lê/Persiste Dados transacionais")
-    Rel(igc, rmq, "Emite filas de mensagens assíncronas")
-    Rel(igc, redis, "Checa bloqueios contra duplicidades de emissão")
-    Rel(igc, localstack, "Deposita/Extrai URLs assinadas")
+sequenceDiagram
+  participant UI as Angular
+  participant API as Agreement handler
+  participant R as Redis
+  participant DB as SQL Server
+  participant S as S3
+  participant Q as RabbitMQ
+  UI->>API: Formalize agreement
+  API->>R: Acquire 45s lease
+  API->>DB: Check contract and active agreement
+  API->>DB: Save agreement
+  loop Each installment
+    API->>S: Generate and upload PDF
+    API->>DB: Save billet
+  end
+  API->>DB: Save contract status
+  API->>Q: AgreementFormalizedEvent
+  Q->>R: Consumer invalidates debt cache
+  API-->>UI: Agreement DTO
 ```
 
-## Dissecando o Backend (.NET 8)
+## Arquivos relacionados
 
-O modelo central estrutura separadamente sua capacidade computacional em camadas agnósticas.
+- [backend/Application/Commands/CreateAgreementCommandHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Commands/CreateAgreementCommandHandler.cs)
+- [backend/Application/Consumers/AgreementFormalizedConsumer.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Consumers/AgreementFormalizedConsumer.cs)
+- [backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs)
+- [backend/Application/Services/Contracts/ContractAccessService.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Services/Contracts/ContractAccessService.cs)
+- [backend/Application/Queries/GetBilletPdfQueryHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Queries/GetBilletPdfQueryHandler.cs)
+- [backend/Infrastructure/Configuration/AppSettings.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Configuration/AppSettings.cs)
+- [docker-compose.yml](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/docker-compose.yml)
+- [backend/Infrastructure/Repositories/GenericRepository.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Repositories/GenericRepository.cs)
 
-- **API Layer**: Posição exposta orientando as diretrizes de conexão REST com o script fundacional no `Program.cs`. É onde ficam escudos protetores críticos vitais como o `RouteProtectionMiddleware` e extratores massivos via `AuditLogMiddleware`.
-- **Application Layer**: Inteira espinha dorsal lógica estruturada sobre os ombros do **CQRS** (pelo `MediatR`). Impede que uma Query complexa de leitura afete arquitetonicamente um Command de escrita do banco.
-- **Domain Layer**: Entidades cruas, livres de vícios atrelados ao Entity-Framework. É aqui que moram os esqueletos de Interfaces cruciais apontando para os repositórios.
-- **Infrastructure Layer**: Envelopagem prática de ações: o `EF Core` definindo as amarras dos bancos, instâncias configuradas conectando serviços externos como fila provinda do RabbitMQ ou nuvens de blob do S3.
+## Navegação
 
-### Padrões Intrinsecamente Adotados
-- **Distributed Locking Mechanism:** Utiliza ativamente sua peça fundamental `RedisDistributedLock` assegurando transações blindadas de bloqueio atômico. Interrompe requisições adjacentes emitindos choques de duplicação quando se tenta emitir mais de uma subscrição por documento num ínterim perigoso.
-- **Strategy Pattern Routing:** A ramificação inteligente controlada via `InvoiceGeneratorCDebtCalculationStrategy`. Ele molda os custos dos parcelamentos injetando matrizes precisas perfeitamente variadas perante cada cenário requisitado da API.
-- **Event-Driven Architecture (EDA):** Tira vasto benefício soltando instâncias reacionais como `AgreementFormalizedEvent` para o ar através das alhetas do RabbitMQ, consumindo de forma não-bloqueante a posterior consolidação.
-
-## Componentização Frontend (Angular 17)
-
-Um visual totalmente preparado para engajamentos robustos em corporações escaladas:
-- **Módulos Core / Shared**: Encapsula esferas essenciais (como *interceptors HTTP*) alinhando cada ponta criptografada originada para o backend por JWT. Fornece ferramentas modulares reutilizadas.
-- **Áreas Feature Separadas**: Isola as páginas dividindo as obrigações para `admin` apenas no gerenciamento das tabelas internas ou subentidades operacionais e para o `dashboard` na carga efetiva perante boletos interligando exibições _sandboxed_.
-- **Fidelização ao Material Design**: Fibras profundas atreladas as tabelas estendidas com hierarquias abertas do Angular Material, popups engajados nativos que suportam 100% inversão imediata de temas via CSS no **Dark Mode**.
-
-## A Ponte Esculpidas API -> Frontend
-
-Padrões definitivos blindados por esses preceitos básicos englobam a camada:
-- **Nginx Reverse Proxy Logic**: Atua disfarçando as portas diretas rodando pelo `Port 80`, varrendo as aberturas do SPA e roteando assertivamente tudo aquilo engatilhado em caminhos iniciados por `/api/` para os confins invisiveís da infra dotNet central.
-- **Segurança HttpOnly**: Garantia máxima ao empurrar tramas decodificadas de autenticação em formato *Cookies HttpOnly*, bloqueando assim que eventuais *Cross-Site Scripting (XSS)* perigosos invadam ou subtraiam autorizações abertas globalmente por via frontend Javascript.
+- [Project guide](?menu=pt&lang=pt&id=19)
+- [Source reference](?menu=pt&lang=pt&id=20)

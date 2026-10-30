@@ -1,54 +1,31 @@
-# Business Rules and Algorithms
+# Business Rules
 
-The core value of **Invoice Generator C** resides in its flawless debt management calculation and how it handles strict financial rules when agreements are being generated and accepted.
+Application for collection contracts, debt calculation, agreement negotiation and installment documents. The backend is C#/.NET despite the -c suffix. Generated payment slips/codes are demonstrative: formalization does not register a bank charge or confirm bank payment.
 
-## 1. Debt Strategy Methodology
+## Workflow and failure cases
 
-When visualising a portfolio of debts natively known within the system as `Contracts`, the entire amount is pushed via a Strategy context (`InvoiceGeneratorCDebtCalculationStrategy`).
+1. Registration → password/user validation → password hashing → login → JWT and HttpOnly/Secure/SameSite=Strict cookie. Login also returns Token in JSON. Controllers and ContractAccessService enforce roles and contract access. AdminPanel handles user/contract administration; the HTTP catalog is in the reference.
 
-**Mathematical Core Algorithm**:
-- **Gross Principal:** Directly pulled from the underlying debt.
-- **Default Penalty Rules:** A fixed parameterized rate or an adaptive fine is applied across the base principle depending on variables.
+2. Contract → installments → portfolio-specific calculation. Per installment, daysOverdue=max(0, referenceDate-dueDate); penalty=principal×percent/100 only when overdue; interest=principal×(monthlyRate/100/daysPerMonth)×daysOverdue. Rates come from AppSettings; invalid daysPerMonth falls back to 30. CurrentValue sums principal, penalty and interest. The query uses cache and checks contract access.
 
-> [!TIP]
-> This dynamic pattern enables scaling up different variants of tax calculations effortlessly simply by appending an alternative strategy concrete class without interfering with existing dependencies.
+3. Formalization validates 1–24 installments, acquires Redis formalize:{contractId} for 45 seconds and checks access/active agreements. Lock failure returns 409; an active agreement returns 400. It creates Agreement/Billets, divides the amount rounded to two decimals and uses 30-day due-date intervals. QuestPDF generates PDFs in the handler before event publication.
 
-## 2. Distributed Locking Workflow
+4. Each PDF goes to storage; upload failure makes the handler store a mock URL. The contract becomes Negotiated and publishes AgreementFormalizedEvent. The consumer invalidates the debt cache and records idem:agreement:{id} in Redis for 30 days; it does not generate PDFs. Payment-slip queries check access and attempt PDF retrieval with an HTML fallback in the service.
 
-Dealing with debts involves an extreme requirement avoiding multi-clicks from a frustrated frontend user rendering multiple different Billets against a single exact debt balance.
+5. GenericRepository.AddAsync and UpdateAsync call SaveChangesAsync immediately. Agreement is persisted before the PDF loop, each Billet after upload, and the contract before the event. The entire formalization has no wrapping transaction; intermediate failure can leave a partial agreement/installments. Inspect persisted state before retrying.
 
-This is securely safeguarded via `RedisDistributedLock`.
-The algorithm follows this sequence deeply:
+## Related files
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor CLI as Frontend User
-    participant BE as Backend Handler
-    participant R as Redis Storage
-    participant EF as Database
-    
-    CLI->>BE: POST /api/Agreements/formalize
-    BE->>R: Request Lock "Formalize_Billet_{DebtID}"
-    
-    alt Lock Unavailable
-        R-->>BE: Deny Lock Acquisition (False)
-        BE-->>CLI: 409 Conflict "Request overlaps, wait..."
-    else Lock Success
-        R-->>BE: Acquired Lock True (Expiration 15s)
-        BE->>EF: Formalize Agreement Object
-        EF-->>BE: OK (Generated UUID)
-        BE->>R: Free up/Release Lock Manually
-        BE-->>CLI: 200 OK Return Document
-    end
-```
+- [backend/Application/Commands/CreateAgreementCommandHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Commands/CreateAgreementCommandHandler.cs)
+- [backend/Application/Consumers/AgreementFormalizedConsumer.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Consumers/AgreementFormalizedConsumer.cs)
+- [backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs)
+- [backend/Application/Services/Contracts/ContractAccessService.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Services/Contracts/ContractAccessService.cs)
+- [backend/Application/Queries/GetBilletPdfQueryHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Queries/GetBilletPdfQueryHandler.cs)
+- [backend/Infrastructure/Configuration/AppSettings.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Configuration/AppSettings.cs)
+- [docker-compose.yml](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/docker-compose.yml)
+- [backend/Infrastructure/Repositories/GenericRepository.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Repositories/GenericRepository.cs)
 
-## 3. Emitting Documents (QuestPDF & S3)
+## Navigation
 
-The generation is detached and secure.
-1. The validated debt object data runs against `QuestPDF` elements generating pixel-perfect `.pdf` variants of standard Boletos natively inside the C# bounds avoiding external bloated rendering hooks.
-2. The payload is not leaked across responses under base64 shapes, it natively flows upstream onto LocalStack S3 returning only the object presigned route back avoiding enormous payloads jamming JSON serialization.
-
-## 4. Robust Authorization Mechanisms
-
-All actions adhere comprehensively towards `RouteProtectionMiddleware`. Extensional mechanisms block accesses actively validating Tenant properties bounding data horizontally guaranteeing exclusivity. Furthermore, any failure traces its explicit footprint deeply into the internal Audit Pipeline hiding precise coordinates using AES-256 for anonymizing incoming IPs while maintaining analytic clarity tracing down specific events precisely across endpoints and queries.
+- [Project guide](?menu=en&lang=en&id=19)
+- [Source reference](?menu=en&lang=en&id=20)

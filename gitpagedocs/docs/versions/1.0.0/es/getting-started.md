@@ -1,98 +1,72 @@
 # Primeros Pasos
 
-Bienvenido a la documentación oficial y altamente detallada del portal **Invoice Generator C**.
+Aplicación de contratos de cobro, cálculo de deuda, negociación y documentos de cuotas. El backend es C#/.NET pese al sufijo -c. Los documentos y códigos son demostrativos: formalizar no registra un cobro bancario ni confirma un pago.
 
-La plataforma constituye una propuesta empresarial nativa de la Nube conformada integralmente para controlar altos volúmenes de cálculo de deudas y su formalización consecuente en arreglos, apoyada desde el core `.NET 8` mediante una fachada elaborada puramente utilizando el entorno de `Angular 17`.
+## Configuración y despliegue
 
-## 1. Requisitos Indispensables
+Copie envexample.txt a .env y configure valores locales. Compose reúne SQL Server/inicialización, API, Redis, RabbitMQ, Elasticsearch, LocalStack y Angular. Use sus puertos efectivos. Fuera de Docker use SDK .NET 9 y npm ci en frontend; prestart/prebuild sincronizan el entorno raíz. Valide dotnet test/build y npm test/build. Si falta un documento revise PdfUrl/S3/fallback; si la deuda está obsoleta revise caché/consumer; ante 409 revise el lock. El workflow publica documentación, no estos servicios.
 
-Toda la interconexión local del sistema ha sido amparada usando técnicas pesadas en Virtualización vía Docker Engine. Por lo tanto, garantice estar blindado con el equipamiento aquí resaltado:
+## Comandos de ejecución
 
-| Herramienta | Versión Sugerida | Proósito Dentro Del Sistema |
-|------|-----------|-----------|
-| **.NET SDK** | 8.0.x | Construcción primordial del backend e interacción del CLI general de EF Core. |
-| **Node.js** | 18.17.x (LTS) | Pilar elemental para descargar repositorios de base al servidor cliente. |
-| **Angular CLI** | 17.0+ | Puntos de vigilancia interactiva en rearmado y generación SPA local. |
-| **Docker Engine** | 24.x+ | Entidad encargada de orquestar toda base perimetral del ecosistema. |
-| **Docker Compose** | V2 | Vinculador oficial para dictaminar el árbol de procesos dependientes. |
-
-## 2. Puesta En Operación del Entorno
-
-Todo rincón del código ha mutado a estar sumamente seccionado y distribuido en subestaciones, esto trae el brillante provecho en el que puedes reproducir un escenario de Nivel de Producción solo levantando el _Compose_.
-
-### Clonando la Arquitectura Base
-
-```bash
-git clone https://github.com/vidigal-code/invoice-generator-c.git
-cd invoice-generator-c
+```sh
+docker compose up --build
+# Validation in a separately configured test environment
+dotnet test backend/InvoiceGenerator.Api.csproj
+dotnet build backend/InvoiceGenerator.Api.csproj
+npm --prefix frontend ci
+npm --prefix frontend run build
 ```
 
-### Inicialización Fast-Track (Docker)
+Los nombres proceden solo de archivos de ejemplo y referencias del código. Configure los valores localmente; se excluyen credenciales privadas. NEXT_PUBLIC_ y VITE_ son variables públicas en el navegador.
 
-El archivo `docker-compose.yml`, el cual vigila sobre el inicio del repositorio, acopla los servicios cruciales enumerados aquí:
-- **api**: A la cabeza guiando el tráfico en el puente expuesto `8081` a través de _Kestrel_.
-- **frontend**: Capa de aplicación uniplágina unida en proxy pasante vía *Nginx*.
-- **sqlserver**: Relacional que enfrasca una versión robusta local Edge SQL.
-- **redis**: Esencial como una red blindada de colisiones para las Formalizaciones de Pagos simultáneos y _Locks_.
-- **rabbitmq**: El Broker y cerebro delegador que despacha y absorbe tareas al _background_.
-- **localstack**: Simulador nativo en tiempo real que oculta nuestra interdependencia AWS garantizando retención a través de depósitos en S3.
+| Variable | Origen |
+| --- | --- |
+| `ADMIN_EMAIL` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `ADMIN_PASSWORD` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `ADMIN_USERNAME` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `ANGULAR_API_URL` | [frontend/scripts/sync-env-from-root.mjs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/scripts/sync-env-from-root.mjs) |
+| `ANGULAR_APP_TITLE` | [frontend/scripts/sync-env-from-root.mjs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/scripts/sync-env-from-root.mjs) |
+| `API_TITLE` | [frontend/scripts/sync-env-from-root.mjs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/scripts/sync-env-from-root.mjs) |
+| `AWS_ACCESS_KEY_ID` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `AWS_ENDPOINT_URL` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `AWS_REGION` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `AWS_S3_BUCKET` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `AWS_SECRET_ACCESS_KEY` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `BACKEND_CONTAINER_PORT` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `BACKEND_HOST_PORT` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `CORS_ALLOWED_ORIGINS` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `DB_PASSWORD` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `ELASTICSEARCH_URI` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `ENVIRONMENT` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `FRONTEND_CONTAINER_PORT` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `FRONTEND_HOST_PORT` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `JWE_SECRET` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `JWT_SECRET` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `LOGGING_FILE_PATH` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `LOGGING_LEVEL` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `RABBITMQ_HOST` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `RABBITMQ_PASS` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `RABBITMQ_USER` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `RATE_LIMIT_PERMITS` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `RATE_LIMIT_QUEUE` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `RATE_LIMIT_WINDOW_MINUTES` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `REDIS_CONNECTION` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `SECURITY_MAX_PAYLOAD_MB` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `SECURITY_REQUEST_TIMEOUT_SECONDS` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `START_THEME` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
 
-```bash
-# Lanzar un set sin amarrarse del flujo interactivo
-docker-compose up -d --build
-```
-> [!NOTE]
-> Su compilación número cero podrá costarle múltiples minutos tras la recuperación totalitaria de librerías del backend (NuGet), front-end compresión de binarios (NPM) y absorciones demoradas del contenedor de S3.
+## Archivos relacionados
 
-### Mapeo de Puntos de Acceso Rápido
+- [backend/Application/Commands/CreateAgreementCommandHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Commands/CreateAgreementCommandHandler.cs)
+- [backend/Application/Consumers/AgreementFormalizedConsumer.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Consumers/AgreementFormalizedConsumer.cs)
+- [backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs)
+- [backend/Application/Services/Contracts/ContractAccessService.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Services/Contracts/ContractAccessService.cs)
+- [backend/Application/Queries/GetBilletPdfQueryHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Queries/GetBilletPdfQueryHandler.cs)
+- [backend/Infrastructure/Configuration/AppSettings.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Configuration/AppSettings.cs)
+- [docker-compose.yml](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/docker-compose.yml)
+- [backend/Infrastructure/Repositories/GenericRepository.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Repositories/GenericRepository.cs)
 
-Luego de confirmada la construcción en el contorno dictaminado por los loggers, aquí están sus atajos hacia el monitoreo de componentes:
+## Navegación
 
-| Entidad Virtual | Atajo Recomendado | Meta Estricta |
-|------|-----------|-------|
-| Interfaz Global Angular | `http://localhost:8081` | Tablero (Dashboard) Frontal Operacional |
-| Referencias OpenAPI Swagger | `http://localhost:8081/swagger` | Ensayos Controlados (Endpoints y Headers) |
-| Console MassTransit RMQ | `http://localhost:15672` | Monitoreo Activo sobre Las Colas en Uso |
-
-## 3. Parametrización y Variables Críticas
-
-Deberá poseer en su documento guía principal (en `appsettings.Development.json` o al configurar variables sobre el marco en `.env`) llaves estrictamente forjadas que evitan el deceso crónico de acceso al inicializar los registros.
-
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost,1433;Database=InvoiceGenerator;User Id=sa;Password=Clave_Segura#1A;TrustServerCertificate=True"
-  },
-  "RabbitMQ": {
-    "Host": "localhost",
-    "Username": "guest",
-    "Password": "guest"
-  },
-  "Redis": {
-    "ConnectionString": "localhost:6379"
-  },
-  "S3": {
-    "Endpoint": "http://localhost:4566",
-    "AccessKey": "test",
-    "SecretKey": "test",
-    "BucketName": "billets"
-  },
-  "Security": {
-    "CorsOrigins": "http://localhost:8081,http://localhost:4200"
-  },
-  "AdminSettings": {
-    "AdminEmail": "admin@system.local",
-    "AdminPassword": "Admin@12345"
-  }
-}
-```
-
-## 4. Teardown Controlado (Limpieza Destructiva)
-
-Mantener vastos archivos y registros por innumerables horas, primordialmente los de S3 o rastros póstumos de RabbitMQ, suele derivar en una gran erosión al almacenamiento temporal de la PC local. Ante cualquier deseo de borrar lo generado (reseteo abrupto):
-
-```bash
-docker-compose down -v --rmi local
-```
-> [!WARNING]
-> Aplíquese tan solo habiéndose certificado en cuenta previa que todo bloque persistente (Docker volumes) en el interior virtual de bases de datos será devastado. Esta directiva soluciona problemas extraños que aparecen sobre el _Seeder_, pero fulminará instantáneamente cuentas añadidas.
+- [Project guide](?menu=es&lang=es&id=19)
+- [Source reference](?menu=es&lang=es&id=20)

@@ -1,54 +1,31 @@
-# Regras de Negócio e Algoritmos Puros
+# Regras de Negócio
 
-O genuíno valor fundacional do **Invoice Generator C** apoia-se firmemente em como a plataforma dita, reage e consolida gestões perante regulamentações de formalização altamente rígidas associadas a pagamentos.
+Aplicação de contratos de cobrança, cálculo de dívida, negociação de acordos e emissão de documentos de parcelas. O backend é C#/.NET, apesar do sufixo -c. Boletos e códigos gerados têm caráter demonstrativo: a formalização não registra cobrança em banco nem confirma pagamento bancário.
 
-## 1. Estratégia de Cálculo Transmissível (Strategy Pattern)
+## Fluxo e casos de falha
 
-Ao solicitar visualizações de agregados ou sub-dívidas amarradas sob domínios ditos como `Contracts`, este montante sofre recalibração impulsionada contextualmente ativando invariavelmente a classe estrita de cálculo: `InvoiceGeneratorCDebtCalculationStrategy`.
+1. Cadastro → validação de senha/usuário → hash de senha → login → JWT e cookie HttpOnly/Secure/SameSite=Strict. O login também devolve Token no JSON. Controllers e ContractAccessService aplicam papéis e acesso ao contrato. Administração de usuários e contratos fica em AdminPanel; o catálogo HTTP está na referência.
 
-**Mecânica Matemática da Subclasse Padrão**:
-- **Tratamento do Principal Bruto:** Obtido de maneira relacional direta da dívida bruta matriz.
-- **Parametrização Taxativa (Fines/Juros):** Taxas reativas e multas fixas atreladas às quebras de acordos que adaptam-se fluente às varáveis e temporalidade do devedor.
+2. Contrato → parcelas → cálculo por carteira. Para cada parcela, diasEmAtraso=max(0, dataReferência-dataVencimento); multa=principal×percentual/100 apenas se atrasada; juros=principal×(taxaMensal/100/diasPorMês)×diasEmAtraso. As taxas vêm de AppSettings; diasPorMês recai em 30 quando inválido. CurrentValue soma principal, multa e juros. A query usa cache e respeita acesso ao contrato.
 
-> [!TIP]
-> A engenharia deste design Pattern confere ao desenvolvedor poderes de anexar lógicas radicalmente divergentes sobre novos clientes estendendo novas interfaces da Strategy e nunca reescrevendo código central consolidado.
+3. Formalização valida de 1 a 24 parcelas, adquire Redis formalize:{contractId} por 45 segundos, verifica acesso e acordo ativo. Trava indisponível retorna 409; acordo ativo retorna 400. Gera Agreement e Billets, divide o valor com arredondamento a duas casas e vencimentos em intervalos de 30 dias. QuestPDF gera PDFs no próprio handler, antes da publicação do evento.
 
-## 2. A Trava Central: Distributed Locking Workflow
+4. Cada PDF segue ao adaptador de armazenamento; se o upload falha, o handler grava uma URL mock. O contrato muda para Negotiated e publica AgreementFormalizedEvent. O consumer invalida o cache de dívida e grava idem:agreement:{id} no Redis por 30 dias; ele não gera os PDFs. A consulta de boleto verifica acesso e tenta recuperar o PDF, com fallback HTML conforme o serviço.
 
-Assinar lides dívidas expostas num frontend pode acarretar engarrafamentos perigosos (ex. picos massivos ou "double-clicks" de estresse originados de conexões fracas) despachando várias petições de formalizações paralelas. Consequentemente se geraria boletos bizarramente clonados para um boleto final idêntico. 
+5. GenericRepository.AddAsync e UpdateAsync chamam SaveChangesAsync imediatamente. Agreement é persistido antes do loop de PDFs, cada Billet após seu upload e o contrato antes do evento. Não há transação envolvendo a formalização inteira; uma falha intermediária pode deixar acordo ou parcelas parciais. Confira o estado persistido antes de tentar novamente.
 
-O escudo impenetrável contra tais fatalidades obedece aos laços do `RedisDistributedLock`.
-Eis o mapa seqüêncial estrito delineado em tempo de ação:
+## Arquivos relacionados
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor CLI as Cliente (Angular)
-    participant BE as Handler de Formalização
-    participant R as Redis (Motor Memória)
-    participant EF as Base SQL Engine
-    
-    CLI->>BE: POST /api/Agreements/formalize
-    BE->>R: Requisita Tranca "Formalize_Billet_{DebtID}"
-    
-    alt Tranca Ocupada ou Negada
-        R-->>BE: Retorna Negação de Aquisição (False)
-        BE-->>CLI: HTTP 409 Conflict "Uma formalização atrelada já corre neste momento."
-    else Concessão de Tranca Confirmada
-        R-->>BE: Tranca Exclusiva Garantida (Exp. Segura 15s)
-        BE->>EF: Efetivação do Acordo Transacional
-        EF-->>BE: Commit Pleno (Acordo OK)
-        BE->>R: Desbloqueio e Eliminação da Tranca
-        BE-->>CLI: 200 OK Retorna Presigned Link Boleto
-    end
-```
+- [backend/Application/Commands/CreateAgreementCommandHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Commands/CreateAgreementCommandHandler.cs)
+- [backend/Application/Consumers/AgreementFormalizedConsumer.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Consumers/AgreementFormalizedConsumer.cs)
+- [backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs)
+- [backend/Application/Services/Contracts/ContractAccessService.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Services/Contracts/ContractAccessService.cs)
+- [backend/Application/Queries/GetBilletPdfQueryHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Queries/GetBilletPdfQueryHandler.cs)
+- [backend/Infrastructure/Configuration/AppSettings.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Configuration/AppSettings.cs)
+- [docker-compose.yml](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/docker-compose.yml)
+- [backend/Infrastructure/Repositories/GenericRepository.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Repositories/GenericRepository.cs)
 
-## 3. Motorização De Documentos (QuestPDF & Cloud S3 Local)
+## Navegação
 
-O renderizador base das folhas obedece ao isolamento performático de infra blidando todo trajeto sensível do boleto gerado.
-1. Quando validadas, as rotas repassam seus objetos de acordo abertos paras raízes do `QuestPDF` estruturando milimetricamente dezenas vetoriais num papel digital `.pdf` perfeito dentro das trincheiras nativas limpas de dependências HTMLs instáveis.
-2. Esta massa brutal binária escapa do perigo atroz do envio em String base64 na resposta final ao utilizador e salta magicamente amarrações na S3 (LocalStack mockado nos fluxos de testes), regressando unicamente sua identidade rastreável de URL segura finalizando de praxe sem entupir serializações pesadas e doloridas aos servidores.
-
-## 4. Raízes Firmes em Auditoria (RBAC Plus)
-
-As diretivas respondem ao mandato fechado ditado atenciosamente através da interceptação cega pelo `RouteProtectionMiddleware`. Entidades e fluxogramas inteiros baseiam as regras bloqueantes ou abertas por validações cegas orientadas sobre subestruturas de isolamento lógico Tenant onde cruzamento indevido de requisições cai duramente rechaçado instantaneamente. Ocorrências fatais rastreiam assinaturas na raiz nativa repassando aos Registradores do Audit de maneira pseudo-mascarada dissimulando os últimos octetos de IP dos agressores via máscaras AES-256 e assim retendo precisão integral na identificação dos eventos para análises tardias.
+- [Project guide](?menu=pt&lang=pt&id=19)
+- [Source reference](?menu=pt&lang=pt&id=20)

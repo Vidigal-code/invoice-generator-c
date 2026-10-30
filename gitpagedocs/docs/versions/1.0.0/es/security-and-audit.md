@@ -1,24 +1,29 @@
-# Fundaciones Protectores y Rastros de Seguridad (Auditoría)
+# Seguridad y Auditoria
 
-La inmunidad operacional y presunción al resguardo dominan la brújula central sobre **Invoice Generator C**. Todo rastro derivado en manipulación sensible de fondos empujó a trazar fronteras férreas adoptando arquitecturas Role-Based (RBAC) asilando cruce de daños e impidiendo extracciones masivas por rastreo impune.
+Aplicación de contratos de cobro, cálculo de deuda, negociación y documentos de cuotas. El backend es C#/.NET pese al sufijo -c. Los documentos y códigos son demostrativos: formalizar no registra un cobro bancario ni confirma un pago.
 
-## 1. Controles Parametrizados de Acceso (RBAC)
+## Contratos de datos
 
-Las identificaciones emanan un JWT inyectando estrictamente jerarquías y derechos aislados al contexto actual transaccional.
-- **Muralla de Inspección (RouteProtectionMiddleware)**: Engloba un componente incansable anclado ciegamente a toda solicitud transitada cruzando el protocolo base `.NET`. Siembra muros impasables, reaccionando frente el acceso cruzado del operador y devolviendo estocadas `HTTP 403 Forbidden` a un infiltrado o analista desautorizado.
-- **Defensas Multi-Tenant (Segregamiento Vívido)**: Extiende más acentuada una protección vetando por completo a quien ostenta un Cargo Supremo (Administrador) escalar dentro e infiltrar operaciones a clientes apartados regidos albergados internamente; imposibilitando la asfixia cruzada corporativa e injerencias catastróficas delictivas. 
+Entidades centrales: User/Role, Contract/Installment, Agreement/Billet, ContractHistory y AuditLog. FluentValidation y dominio validan; consultas y formalización comparten control de acceso. El almacenamiento tiene protección AES-GCM de payload. Eso no anonimiza logs. El bloqueo tiene caducidad fija; deduplicar mediante consulta y escritura no garantiza exactly-once. El redondeo puede dejar diferencia residual entre cuotas y total.
 
-## 2. Opacidad IP Parametrizada por Núcleo Cifrado (AES-256) 
+## Flujo y casos de fallo
 
-Leyes Internacionales resguardan direcciones conectivas IP directas y crudas para su uso global sin contención legal de privacidad.
-Ante esta encrucijada, durante el transcurso dentro y caída libre hacia repositorios de `AuditService`, la traza se mutila controlada mediante algoritmos matemáticos en la estricta codificación **AES-256**:
+Registro → validación de contraseña/usuario → hash → login → JWT y cookie HttpOnly/Secure/SameSite=Strict. Login también devuelve Token en JSON. Controllers y ContractAccessService aplican roles y acceso al contrato. AdminPanel administra usuarios/contratos; el catálogo HTTP está en la referencia.
 
-`172.16.254.1` -> `172.16.*.* [...B3cFv]`
+Copie envexample.txt a .env y configure valores locales. Compose reúne SQL Server/inicialización, API, Redis, RabbitMQ, Elasticsearch, LocalStack y Angular. Use sus puertos efectivos. Fuera de Docker use SDK .NET 9 y npm ci en frontend; prestart/prebuild sincronizan el entorno raíz. Valide dotnet test/build y npm test/build. Si falta un documento revise PdfUrl/S3/fallback; si la deuda está obsoleta revise caché/consumer; ante 409 revise el lock. El workflow publica documentación, no estos servicios.
 
-El motor se envuelve a través de una llave secreta maestra en el corazón de variable de contenedor; proporcionando una vía muerta inútil si la base se viere transgredida, a la par reteniendo para delegaciones judiciales habilitación reversible puntual legal.
+## Archivos relacionados
 
-## 3. Supresión Explotativa Cruzada (XSS & CSRF)
+- [backend/Application/Commands/CreateAgreementCommandHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Commands/CreateAgreementCommandHandler.cs)
+- [backend/Application/Consumers/AgreementFormalizedConsumer.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Consumers/AgreementFormalizedConsumer.cs)
+- [backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs)
+- [backend/Application/Services/Contracts/ContractAccessService.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Services/Contracts/ContractAccessService.cs)
+- [backend/Application/Queries/GetBilletPdfQueryHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Queries/GetBilletPdfQueryHandler.cs)
+- [backend/Infrastructure/Configuration/AppSettings.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Configuration/AppSettings.cs)
+- [docker-compose.yml](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/docker-compose.yml)
+- [backend/Infrastructure/Repositories/GenericRepository.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Repositories/GenericRepository.cs)
 
-Aplicaciones modernas exponen sin recato un Token de Acceso JWT hacia depósitos estáticos fácilmente descifrables explotables y vulnerables ante adiciones invasivas cruzadas en el navegador `[Cross-Site Scripting]`.
-- **Evasión Absoluta ante XSS**: El testigo portador vital no toca rutinas internas escritas en código Angular. Entra envuelto bajo mantos herméticos denominadores marcados con protocolo de estatus `HttpOnly Cookie`. Imposibilitando orgánicamente que lógicas maléficas o sub complementos intenten leer, retener y duplicar copias falsas enviables al criminal extraído remotamente.
-- **Obligaciones Strict SameSite**: Obliga rotundamente atando exclusión si cruzar el token se hiciese con desfasadas peticiones orquestadas entre un atacante cruzado malversando llamadas externas falsarias originadas en orígenes y sitios sin validación (Mitigante a escala rotundo ante trampas `CSRF Mocks`).
+## Navegación
+
+- [Project guide](?menu=es&lang=es&id=19)
+- [Source reference](?menu=es&lang=es&id=20)

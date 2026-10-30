@@ -1,59 +1,72 @@
-# Disposiciones Avanzadas al Despliegue Crítico (CI/CD)
+# Guía de Despliegue
 
-Saltar el foso virtual de su aislamiento en simulación _Local Dockerizada_ y elevar íntegramente todo bloque funcional de manera madura sobre estamentos productivos se perfila maravillosamente pulcro a causa de nuestro total aislamiento perimental. 
+Aplicación de contratos de cobro, cálculo de deuda, negociación y documentos de cuotas. El backend es C#/.NET pese al sufijo -c. Los documentos y códigos son demostrativos: formalizar no registra un cobro bancario ni confirma un pago.
 
-## 1. Mapeo Topológico En Cloud Escalado (Ej. Directrices Amazon AWS)
+## Configuración y despliegue
 
-Abrazando expansiones formidables sin mermar la potencia resolutivas y logrando elasticidades robustas automáticas garantizadas horizontalmente re-enlazamos contenedores efímeros bajo paraguas administrados fiables:
+Copie envexample.txt a .env y configure valores locales. Compose reúne SQL Server/inicialización, API, Redis, RabbitMQ, Elasticsearch, LocalStack y Angular. Use sus puertos efectivos. Fuera de Docker use SDK .NET 9 y npm ci en frontend; prestart/prebuild sincronizan el entorno raíz. Valide dotnet test/build y npm test/build. Si falta un documento revise PdfUrl/S3/fallback; si la deuda está obsoleta revise caché/consumer; ante 409 revise el lock. El workflow publica documentación, no estos servicios.
 
-| Base Contenedora de Prueba | Equivalente Gestionado Directo AWS | Impacto De Migración Activo |
-|------|-----------|-----------|
-| **sqlserver** | Ambiente Relacional AWS RDS | Copias incrementales temporizadas sin error humano y reanimaciones con redundancia Multi-AZ ciegas e instantáneas. |
-| **redis** | Celdas Memory AWS ElastiCache | Reactividad veloz de ultra bajísimo latido fortificando inmensamente cada ciclo y tranca temporal atada a cancelaciones. |
-| **rabbitmq** | Corriente Virtualizada Amazon MQ | Purga total toda administración agotadora y reinserción manual en colapso interno. Se reconstruye y auto reencamina sobre fracasos o pérdidas totales. |
-| **api** | Islas Agrupadas Célula ECS Fargate | Explota y triplica pods virtualizados simultáneos contrarrestando avalanchas durante exigencias duras de cobros a fin de mes. |
-| **frontend** | Contenedor Limpio S3 Auxiliado CloudFront | Absorbe la web en estado rígido minificado para expulsarlo repartidamente global como estalagmita inmutable sin saturación perimetral a bases de cómputo directas. |
-| **localstack** | Envuelta Suprema Involcable S3 Nativa | Bodega maestra donde pernoctarán miles o millones de fojas en formato PDF o XML cifrados asegurando perdurabilidad absoluta blindada. |
+## Comandos de ejecución
 
-## 2. Automatización Continua (CI/CD GitHub Actions Ejemplar)
-
-Ente rector orquestando flujos puros emitiendo órdenes compresión angulares nativas distribuidoras y validando pruebas C# empaquetando al contenedor inmutable productivo definitivo listo al zarpe.
-
-```yaml
-name: Ensamblaje Supremo Unificado Tareas Fijas
-on:
-  push:
-    branches: [ "main" ]
-
-jobs:
-  build_frontend:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Pre Ensamblaje Angular Pistas
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18.x'
-    - name: Formación Y Poda SPA Compresiva
-      run: |
-        npm install
-        npm run build --configuration=production
-
-  build_backend:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Aditamentos Base .NET Ambientes Ciegos
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '8.0.x'
-    - name: Rastros De Validación Restricta Pura (Unitaria)
-      run: dotnet test
-    - name: Amoldar Estructuras Al Contenedor Previo Subida Final
-      run: docker build -t igc-api ./backend
+```sh
+docker compose up --build
+# Validation in a separately configured test environment
+dotnet test backend/InvoiceGenerator.Api.csproj
+dotnet build backend/InvoiceGenerator.Api.csproj
+npm --prefix frontend ci
+npm --prefix frontend run build
 ```
 
-## 3. Disposiciones Con Bases de Datos Críticas Y Semillas
+Los nombres proceden solo de archivos de ejemplo y referencias del código. Configure los valores localmente; se excluyen credenciales privadas. NEXT_PUBLIC_ y VITE_ son variables públicas en el navegador.
 
-Burlar y violar dictamen seguro llamando indiscriminadas rutinas insertadas desde el `Program.cs` originadas globalmente vía el clásico `context.Database.Migrate()` trae la desgracia de arrancar mutaciones destructivas en tablas compartidas o bloquear masificaciones temporales arruinando sus historiales y dejando bases corruptas o partidas a medio ejecutar porque varias copias de su servidor levantado colisionan.
-- Asista la etapa con un *paso rígido transitorio Pipeline Exclusivo* forzando que mande a despertar en asilamiento una imagen fugaz aplicando ciegamente migraciones puras sin estorbos en su único ciclo de labor e hilos solitarios, extinguiéndose instantáneamente luego de validar la asimilación correcta por el gestor de datos universal general.
+| Variable | Origen |
+| --- | --- |
+| `ADMIN_EMAIL` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `ADMIN_PASSWORD` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `ADMIN_USERNAME` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `ANGULAR_API_URL` | [frontend/scripts/sync-env-from-root.mjs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/scripts/sync-env-from-root.mjs) |
+| `ANGULAR_APP_TITLE` | [frontend/scripts/sync-env-from-root.mjs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/scripts/sync-env-from-root.mjs) |
+| `API_TITLE` | [frontend/scripts/sync-env-from-root.mjs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/scripts/sync-env-from-root.mjs) |
+| `AWS_ACCESS_KEY_ID` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `AWS_ENDPOINT_URL` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `AWS_REGION` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `AWS_S3_BUCKET` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `AWS_SECRET_ACCESS_KEY` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `BACKEND_CONTAINER_PORT` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `BACKEND_HOST_PORT` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `CORS_ALLOWED_ORIGINS` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `DB_PASSWORD` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `ELASTICSEARCH_URI` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `ENVIRONMENT` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `FRONTEND_CONTAINER_PORT` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `FRONTEND_HOST_PORT` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `JWE_SECRET` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `JWT_SECRET` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `LOGGING_FILE_PATH` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `LOGGING_LEVEL` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `RABBITMQ_HOST` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `RABBITMQ_PASS` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `RABBITMQ_USER` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `RATE_LIMIT_PERMITS` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `RATE_LIMIT_QUEUE` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `RATE_LIMIT_WINDOW_MINUTES` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `REDIS_CONNECTION` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `SECURITY_MAX_PAYLOAD_MB` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `SECURITY_REQUEST_TIMEOUT_SECONDS` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+| `START_THEME` | [envexample.txt](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/envexample.txt) |
+
+## Archivos relacionados
+
+- [backend/Application/Commands/CreateAgreementCommandHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Commands/CreateAgreementCommandHandler.cs)
+- [backend/Application/Consumers/AgreementFormalizedConsumer.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Consumers/AgreementFormalizedConsumer.cs)
+- [backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs)
+- [backend/Application/Services/Contracts/ContractAccessService.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Services/Contracts/ContractAccessService.cs)
+- [backend/Application/Queries/GetBilletPdfQueryHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Queries/GetBilletPdfQueryHandler.cs)
+- [backend/Infrastructure/Configuration/AppSettings.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Configuration/AppSettings.cs)
+- [docker-compose.yml](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/docker-compose.yml)
+- [backend/Infrastructure/Repositories/GenericRepository.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Repositories/GenericRepository.cs)
+
+## Navegación
+
+- [Project guide](?menu=es&lang=es&id=19)
+- [Source reference](?menu=es&lang=es&id=20)

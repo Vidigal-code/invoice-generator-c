@@ -1,24 +1,29 @@
-# Security and Audit Paradigms
+# Security & Audit
 
-Security sits at the epicenter of **Invoice Generator C**. Because of financial transaction requirements, the system aggressively implements Role-Based Access Control (RBAC), anti-forgery, and advanced auditing.
+Application for collection contracts, debt calculation, agreement negotiation and installment documents. The backend is C#/.NET despite the -c suffix. Generated payment slips/codes are demonstrative: formalization does not register a bank charge or confirm bank payment.
 
-## 1. Role-Based Access Control (RBAC)
+## Data contracts
 
-Authentication yields an explicit, stateless JWT assigned squarely mapping individual Claims (e.g., `Admin`, `Support`, `Guest`).
-- **RouteProtectionMiddleware**: An impenetrable gatekeeper intercepting `/api/x` pipelines unconditionally. It matches current extracted claims against route permissions predefined on the platform layer, automatically dumping intruders to `HTTP 403 Forbidden` limits.
-- **Tenant Isolation**: Beyond horizontal endpoints, vertical protection ensures User `Alpha` possessing "Admin" roles on Tenant A absolutely fails attempting enumeration over Tenant B resources holding identical valid roles globally.
+Core entities: User/Role, Contract/Installment, Agreement/Billet, ContractHistory and AuditLog. Validation uses FluentValidation/domain rules; contract access is shared by queries and formalization. Storage has an AES-GCM payload protector. Payload encryption is not log anonymization. The lock has a fixed expiry; consumer deduplication is check-then-write, not an exactly-once guarantee. Uniform rounding can leave a residual difference between installments and the negotiated total.
 
-## 2. IP Masking via AES-256
+## Workflow and failure cases
 
-Data Privacy regulations demand IP retention alongside hiding.
-The raw IP strings logged actively onto `AuditService` are dynamically truncated and **encrypted via AES-256** right prior database entry.
+Registration → password/user validation → password hashing → login → JWT and HttpOnly/Secure/SameSite=Strict cookie. Login also returns Token in JSON. Controllers and ContractAccessService enforce roles and contract access. AdminPanel handles user/contract administration; the HTTP catalog is in the reference.
 
-`192.168.10.150` -> `192.168.*.* [U2FsdGVkX18a6X...]`
+Copy envexample.txt to .env and configure local values. Docker Compose includes SQL Server/bootstrap, API, Redis, RabbitMQ, Elasticsearch, LocalStack and Angular. Effective ports come from Compose. Outside Docker, use .NET 9 SDK and frontend npm ci; prestart/prebuild synchronize root environment. Validate dotnet test, dotnet build, npm test and npm run build. For missing slips check PdfUrl/S3/fallback; stale debt values require cache/consumer checks; 409 requires lock inspection. The existing workflow publishes documentation, not these services.
 
-The key sits highly coupled inside environment boundaries avoiding exposure. This provides compliance standards retaining tracking exactings if legal procedures trigger decrypt-orders explicitly.
+## Related files
 
-## 3. Defense Against XSS and CSRF 
+- [backend/Application/Commands/CreateAgreementCommandHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Commands/CreateAgreementCommandHandler.cs)
+- [backend/Application/Consumers/AgreementFormalizedConsumer.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Consumers/AgreementFormalizedConsumer.cs)
+- [backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs)
+- [backend/Application/Services/Contracts/ContractAccessService.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Services/Contracts/ContractAccessService.cs)
+- [backend/Application/Queries/GetBilletPdfQueryHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Queries/GetBilletPdfQueryHandler.cs)
+- [backend/Infrastructure/Configuration/AppSettings.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Configuration/AppSettings.cs)
+- [docker-compose.yml](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/docker-compose.yml)
+- [backend/Infrastructure/Repositories/GenericRepository.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Repositories/GenericRepository.cs)
 
-Traditional Token architectures leak easily exposing users against cross-site exploitation.
-- **XSS Nullified**: The generated JWT string traverses backend outputs only encased as an attached *Cookie Component* flagged intrinsically possessing the `HttpOnly` marker. No frontend component (not even our Angular framework natively) retains Javascript reading capacity to clone the token.
-- **SameSite and Secure Headers**: Cookies are transmitted exclusively matching `SameSite=Strict` bounded naturally inside `Secure` contexts over `HTTPS` proxies negating token injection loopholes across domains natively.
+## Navigation
+
+- [Project guide](?menu=en&lang=en&id=19)
+- [Source reference](?menu=en&lang=en&id=20)

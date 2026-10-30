@@ -1,42 +1,38 @@
-# Inmersión Profunda Frontend
+# Componentes del Frontend
 
-**Invoice Generator C** asume posiciones sólidas forjadas plenamente entorno a las ventajas y desacoples integrados base en Angular 17.
+Aplicación de contratos de cobro, cálculo de deuda, negociación y documentos de cuotas. El backend es C#/.NET pese al sufijo -c. Los documentos y códigos son demostrativos: formalizar no registra un cobro bancario ni confirma un pago.
 
-## 1. Disección y Encapsulación Modular
+## Interfaz y estado
 
-La red directiva recorta zonas lógicas utilizando pautas durísimas del estamento `Lazy Loading` restringiendo bultos pesados innecesarios frente descargas del consumidor de navegadores.
-- `admin-logs.component` (`/admin`): Muestra una colección impecablemente armada en grillas ricas vía `MatTable` con paginado escalonado dominado activamente utilizando lógicas de _Debouncers RxJS_ (Evitando asfixiar y petardear el servidor constantemente por letras buscadas).
-- `dashboard.component` (`/dashboard`): Organiza montos adeudados subsidiados, manipulando respuestas `mat-snack-bar` rastreando señales o pausas liberadas remotamente a través de _Eventos RMQ_.
-- `billet-viewer.component`: Rutas hermanadas herméticas encargadas de amarrarse con enlaces presignados S3 y envolver archivos digitales estáticos esquivando brechas en la inserciones originarios del visualizador iFrame nativo.
+ASP.NET Core net9.0 con EF Core 9.0.2/SQL Server, MediatR 14.1, FluentValidation, MassTransit 8.3.1/RabbitMQ, Redis y QuestPDF 2026.2.4; frontend Angular 19.2.19, TypeScript 5.7 y RxJS 7.8. API, Application, Domain e Infrastructure separan HTTP, comandos/queries, entidades y adaptadores. LocalStack puede ofrecer S3. SQL, S3 y RabbitMQ no comparten automáticamente una transacción distribuida.
 
-## 2. Red y Envolturas Seguras (Autenticación Global)
+Entidades centrales: User/Role, Contract/Installment, Agreement/Billet, ContractHistory y AuditLog. FluentValidation y dominio validan; consultas y formalización comparten control de acceso. El almacenamiento tiene protección AES-GCM de payload. Eso no anonimiza logs. El bloqueo tiene caducidad fija; deduplicar mediante consulta y escritura no garantiza exactly-once. El redondeo puede dejar diferencia residual entre cuotas y total.
 
-Evitamos deliberadamente almacenar el vulnerable testigo global de pase (`JWT`) sobre el formato crónico e inseguro del `local-storage` para aplacar invasiones profundas directas por parte de código malicioso XSS. Nuestro puente HTTP principal únicamente asume una amarra inviolable invisible en la sesión:
+Registro → validación de contraseña/usuario → hash → login → JWT y cookie HttpOnly/Secure/SameSite=Strict. Login también devuelve Token en JSON. Controllers y ContractAccessService aplican roles y acceso al contrato. AdminPanel administra usuarios/contratos; el catálogo HTTP está en la referencia.
 
-```typescript
-export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const secureReq = req.clone({
-    withCredentials: true // Delega explícitamente el repase vitalicio al back con un cofre indescifrable Cookies Secure-HttpOnly
-  });
-  return next(secureReq);
-};
-```
+## Fuentes verificadas
 
-## 3. Trinchera De Ejecución Boletera (Sandbox)
+- [frontend/src/app/app.routes.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/app/app.routes.ts)
+- [frontend/src/app/core/services/api.service.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/app/core/services/api.service.ts)
+- [frontend/src/app/core/services/api/admin-panel-api.service.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/app/core/services/api/admin-panel-api.service.ts)
+- [frontend/src/app/core/services/api/auth-api.service.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/app/core/services/api/auth-api.service.ts)
+- [frontend/src/app/core/services/api/contracts-api.service.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/app/core/services/api/contracts-api.service.ts)
+- [frontend/src/app/core/services/api/debt-agreements-billets-api.service.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/app/core/services/api/debt-agreements-billets-api.service.ts)
+- [frontend/src/app/core/services/notification-dialog.service.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/app/core/services/notification-dialog.service.ts)
+- [frontend/src/app/core/services/theme.service.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/app/core/services/theme.service.ts)
 
-La exhibición de cobros listos requeridos recae severamente bajo obligaciones duras para el acoplamiento hermoprotegido. Evita así contaminaciones transversales ocultando la inyección de la procedencia.
+## Archivos relacionados
 
-```html
-<iframe
-    [src]="pdfSafeUrl"
-    sandbox="allow-same-origin allow-scripts"
-    [title]="'Contrato Boleteria'">
-</iframe>
-```
+- [backend/Application/Commands/CreateAgreementCommandHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Commands/CreateAgreementCommandHandler.cs)
+- [backend/Application/Consumers/AgreementFormalizedConsumer.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Consumers/AgreementFormalizedConsumer.cs)
+- [backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Debt/InvoiceGeneratorCDebtCalculationStrategy.cs)
+- [backend/Application/Services/Contracts/ContractAccessService.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Services/Contracts/ContractAccessService.cs)
+- [backend/Application/Queries/GetBilletPdfQueryHandler.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Application/Queries/GetBilletPdfQueryHandler.cs)
+- [backend/Infrastructure/Configuration/AppSettings.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Configuration/AppSettings.cs)
+- [docker-compose.yml](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/docker-compose.yml)
+- [backend/Infrastructure/Repositories/GenericRepository.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Repositories/GenericRepository.cs)
 
-## 4. Compatibilidad Global Oscurecida (Material Dark Mode)
+## Navegación
 
-Por requerimiento estructural fundamental, se dispuso de inmersiones orgánicas e indoloras oscurecedoras del visual. Bajo inagotables horas alterando líneas maestras incrustadas firmemente al root principal de estilos `styles.scss` recae total uniformidad:
-- **Mat-Chips de Status**: Atenúa saturaciones punzantes apaciguando desgastes de pantallas extendidas.
-- **Líneas Mat-Inputs**: Replantea envoltorios, márgenes y sombras iluminando discretamente bajo selectores de evento hover.
-- **Relieves Profundos**: Permuta matices oscurecedores gruesos del marco transformándolo a proyecciones translúcidas tenues conservando volumen arquitectónico puro inclusive dentro de perfiles oscuros masivos profundos.
+- [Project guide](?menu=es&lang=es&id=19)
+- [Source reference](?menu=es&lang=es&id=20)
