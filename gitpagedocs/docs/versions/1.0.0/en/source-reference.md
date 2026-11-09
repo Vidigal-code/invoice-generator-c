@@ -2,7 +2,7 @@
 
 Inventory extracted from manifests and code declarations. Versions using `^` or `~` are declared ranges; the lockfile determines the resolved version.
 
-Commit: `b1c5e2caf2d2a95fb06005b0d61d64792950207c`. GitPageDocs: `0.0.17`.
+Commit: `b1c5e2caf2d2a95fb06005b0d61d64792950207c`. GitPageDocs: `0.0.23`.
 
 ## Dependencies and tooling
 
@@ -206,3 +206,19 @@ Names are extracted only from example files and environment references in source
 - [frontend/src/tests/unit/jwt.interceptor.spec.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/tests/unit/jwt.interceptor.spec.ts)
 - [frontend/src/tests/unit/portfolio-label.pipe.spec.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/tests/unit/portfolio-label.pipe.spec.ts)
 - [frontend/src/tests/unit/portfolio.constants.spec.ts](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/frontend/src/tests/unit/portfolio.constants.spec.ts)
+
+## Documentation maintenance and local MCP
+
+The functional content above describes this project. Viewer configuration targets GitPageDocs **0.0.23**; it does not change the application version or the `1.0.0` documentation directory.
+
+With `@gitpagedocs/cli` 0.0.23 installed, run from this repository's root:
+
+```sh
+gitpagedocs mcp start
+```
+
+The MCP client starts a stdio process; there is no HTTP port or `--cwd` option. Set the process working directory to the project root. `list_files`, `read_file` and the `project://readme` and `project://structure` resources inspect content without an external provider. `write_file` writes the complete target file after review.
+
+`update_documentation` calls a provider and only replaces the region between `gitpagedocs:start` and `gitpagedocs:end`; without those markers, it appends a region. Do not use that flow to automatically replace these complete pages. `validate_docs` is a provider review, not a deterministic check of every link. The `gitpagedocs docs` command updates README/CONTRIBUTING/SECURITY regions with standard GitPageDocs content; it does not update these project-specific pages.
+
+Before publishing, validate JSON, paths for every language, the contents list and links in the viewer. Publication uses the repository workflow; its runtime pin must be updated separately to an available release. Preserve existing menus, themes, icons, public paths and the documentation version.
