@@ -1,6 +1,6 @@
 # invoice-generator-c: Contexto e fluxos do projeto
 
-GitPageDocs **0.0.29** · 1.0.0 · 2026-11-23
+GitPageDocs **0.0.30** · 1.0.0 · 2026-11-24
 
 ## Contexto
 
@@ -74,9 +74,9 @@ Dependências, comandos, endpoints, variáveis, contratos e testes estão na [re
 
 - [backend/Infrastructure/Repositories/GenericRepository.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Repositories/GenericRepository.cs)
 
-## Navegação da documentação com GitPageDocs 0.0.29
+## Navegação da documentação com GitPageDocs 0.0.30
 
-Este guia descreve o runtime GitPageDocs **0.0.29**. A versão documental deste projeto continua **1.0.0**. Atualizar o texto e a configuração não atualiza, por si só, o runtime publicado pelo workflow.
+Este guia descreve o runtime GitPageDocs **0.0.30**. A versão documental deste projeto continua **1.0.0**. Atualizar o texto e a configuração não atualiza, por si só, o runtime publicado pelo workflow.
 
 ### Índice por tags
 
@@ -98,7 +98,7 @@ Com a rolagem do índice desbloqueada, o item ativo é centralizado, inclusive a
 
 Ao validar em celular, confira o menu recolhido, alvos de toque, foco por teclado, tabelas e blocos de código com rolagem horizontal. Em dispositivos dobráveis, repita a navegação com a tela dobrada e aberta, nas duas orientações, e confirme que o item ativo permanece acessível após a mudança de largura. Use o controle de pausa quando houver efeitos animados e respeite a preferência de movimento reduzido.
 
-O GitPageDocs 0.0.29 usa `performance.mode: "auto"` nos efeitos dos temas: reduz moderadamente a densidade no desktop e usa um orçamento menor abaixo de 768px, mantendo as camadas do tema. Partículas ocultas ficam pausadas e retomam a mesma fase ao mudar a largura. Para manter a densidade completa, mescle `site.backgroundEffects.overrides.performance: { "mode": "full" }` em `gitpagedocs/config.json`; a mesma opção pode ser definida em `site.backgroundEffects.themes[themeId].performance`. Um override explícito de `layers` mantém a contagem completa quando não há mode definido nos overrides. Use `"auto"` explicitamente para aplicar o orçamento também às camadas personalizadas.
+O GitPageDocs 0.0.30 usa `performance.mode: "auto"` nos efeitos dos temas: reduz moderadamente a densidade no desktop e usa um orçamento menor abaixo de 768px, mantendo as camadas do tema. Partículas ocultas ficam pausadas e retomam a mesma fase ao mudar a largura. Para manter a densidade completa, mescle `site.backgroundEffects.overrides.performance: { "mode": "full" }` em `gitpagedocs/config.json`; a mesma opção pode ser definida em `site.backgroundEffects.themes[themeId].performance`. Um override explícito de `layers` mantém a contagem completa quando não há mode definido nos overrides. Use `"auto"` explicitamente para aplicar o orçamento também às camadas personalizadas.
 
 ## Família de tema fixa e modo claro/escuro
 
@@ -119,3 +119,11 @@ Desde a 0.0.27, Código fonte limita sua área de conteúdo à altura disponíve
 Na 0.0.29, Anterior, Próximo e Voltar ao topo ficam dentro do cartão Markdown, depois do conteúdo, com 8px de espaço no fluxo normal para não cobrir textos, tabelas ou código. Os botões com ícones seguem o visual compacto de copiar, baixar e tela cheia, com 36px no desktop e controles de toque preservados no celular. Configure `site.documentNavigation.position` como `left`, `center` ou `right`; o padrão é `center`. Os botões dos limites continuam desabilitados, e `site.backToTop.enabled` e `minPageHeightViewports` ainda controlam a exibição de Voltar ao topo.
 
 O ícone padrão do modo foco é `LuScanEye`, diferente do ícone de tela cheia. Configurações explícitas de ícone ou texto continuam disponíveis em `site.icons.FocusMode`. Foco por teclado, preferência de movimento reduzido, traduções e regras de acesso ao conteúdo são preservados. Ao alterar a configuração, confira os três alinhamentos, o último parágrafo e os limites da navegação no desktop e no celular.
+
+## Arquivos de código fonte e navegação da árvore no GitPageDocs 0.0.30
+
+Desde a 0.0.30, Código fonte reconhece arquivos UTF-16LE e UTF-16BE pela marca de ordem de bytes (BOM). O visualizador remove a marca inicial e preserva acentos, texto de alfabetos não latinos e emoji. Arquivos sem BOM de UTF-16 continuam sendo decodificados como UTF-8, incluindo arquivos UTF-8 com BOM. Isso corrige a exibição de arquivos como um `.gitignore` em UTF-16 sem alterar o arquivo do repositório.
+
+A árvore de arquivos permite rolagem horizontal e vertical e exibe os nomes completos de arquivos e pastas. Clicar na linha de uma pasta expande ou recolhe seus itens sem trocar o arquivo aberto nem o endereço atual. A listagem central, os caminhos de navegação e os resultados de pastas filtrados continuam permitindo navegar pelos diretórios. Confira nomes longos e pastas com vários níveis nas duas direções de rolagem; abrir e fechar uma pasta repetidamente deve preservar o arquivo selecionado e o endereço.
+
+O visualizador não tenta adivinhar a codificação de arquivos UTF-16 sem BOM nem adiciona rotas de Código fonte automaticamente. Onde essa visualização estiver configurada, abra um `.gitignore` UTF-16 válido pela lista de diretórios e confira se `node_modules/` está legível. Confira também nomes ou conteúdos de arquivo com acentos, emoji e a volta ao diretório no desktop e no celular. A versão documental continua `1.0.0`.
