@@ -1,6 +1,6 @@
 # invoice-generator-c: Contexto y flujos del proyecto
 
-GitPageDocs **0.0.26** · 1.0.0 · 2026-11-08
+GitPageDocs **0.0.29** · 1.0.0 · 2026-11-23
 
 ## Contexto
 
@@ -74,9 +74,9 @@ Dependencias, comandos, endpoints, variables, contratos y pruebas están en la [
 
 - [backend/Infrastructure/Repositories/GenericRepository.cs](https://github.com/Vidigal-code/invoice-generator-c/blob/b1c5e2caf2d2a95fb06005b0d61d64792950207c/backend/Infrastructure/Repositories/GenericRepository.cs)
 
-## Navegación de la documentación con GitPageDocs 0.0.26
+## Navegación de la documentación con GitPageDocs 0.0.29
 
-Las opciones de esta sección requieren el runtime GitPageDocs **0.0.26**. La versión documental de este proyecto sigue siendo **1.0.0**. Actualizar texto y configuración no actualiza por sí solo el runtime publicado por el workflow.
+Esta guía describe el runtime GitPageDocs **0.0.29**. La versión documental de este proyecto sigue siendo **1.0.0**. Actualizar texto y configuración no actualiza por sí solo el runtime publicado por el workflow.
 
 ### Índice por etiquetas
 
@@ -98,7 +98,7 @@ Con el desplazamiento del índice desbloqueado, la entrada activa queda centrada
 
 Al validar en un móvil, revise el menú contraído, las áreas táctiles, el foco del teclado, las tablas y los bloques de código con desplazamiento horizontal. En dispositivos plegables, repita la navegación con la pantalla plegada y abierta, en ambas orientaciones, y compruebe que la entrada activa siga accesible tras cambiar el ancho. Utilice el control de pausa cuando haya efectos animados y respete la preferencia de movimiento reducido.
 
-GitPageDocs 0.0.26 utiliza `performance.mode: "auto"` para los efectos de los temas: reduce moderadamente la densidad en escritorio y utiliza un presupuesto menor por debajo de 768px, conservando las capas del tema. Las partículas ocultas se pausan y retoman la misma fase al cambiar el ancho. Para mantener la densidad completa, combine `site.backgroundEffects.overrides.performance: { "mode": "full" }` con `gitpagedocs/config.json`; la misma opción está disponible en `site.backgroundEffects.themes[themeId].performance`. Un override explícito de `layers` conserva la cantidad completa cuando no se define mode en los overrides. Seleccione `"auto"` explícitamente para aplicar el presupuesto también a las capas personalizadas.
+GitPageDocs 0.0.29 utiliza `performance.mode: "auto"` para los efectos de los temas: reduce moderadamente la densidad en escritorio y utiliza un presupuesto menor por debajo de 768px, conservando las capas del tema. Las partículas ocultas se pausan y retoman la misma fase al cambiar el ancho. Para mantener la densidad completa, combine `site.backgroundEffects.overrides.performance: { "mode": "full" }` con `gitpagedocs/config.json`; la misma opción está disponible en `site.backgroundEffects.themes[themeId].performance`. Un override explícito de `layers` conserva la cantidad completa cuando no se define mode en los overrides. Seleccione `"auto"` explícitamente para aplicar el presupuesto también a las capas personalizadas.
 
 ## Familia de tema fija y modo claro/oscuro
 
@@ -111,3 +111,11 @@ Las dos entradas del catálogo de layouts deben habilitar `supportsLightAndDarkM
 ## Altura de la guía lateral de escritorio
 
 En pantallas de escritorio con más de 1024 píxeles CSS, la guía lateral termina después de su última entrada, sin extenderse hasta el final del artículo. Desde 0.0.25, puede crecer hasta la altura disponible de la ventana debajo de la cabecera antes de necesitar desplazamiento interno. Este diseño lateral tiene prioridad sobre `TocScrollMaxHeightDesktop`; la guía centrada encima del contenido y los diseños de hasta 1024 píxeles mantienen sus reglas de tamaño anteriores. Una pequeña barra con el color de la entrada activa sigue la sección marcada al desplazarse. El indicador utiliza el seguimiento de secciones existente, sin animación continua. En GitPageDocs 0.0.26, las guías laterales ganan 0.5rem adicionales de espacio debajo de la cabecera (8px con la fuente raíz predeterminada) y conservan 1rem debajo de la tarjeta en el límite de la ventana. Este ajuste se aplica solo por encima de 1024 píxeles CSS; los diseños menores se mantienen.
+
+## Controles de lectura en GitPageDocs 0.0.29
+
+Desde 0.0.27, Código fuente limita su área de contenido a la altura disponible de la ventana y desplaza internamente las listas largas de archivos y las vistas previas, cuando esta vista está habilitada. Desde 0.0.28, la guía del documento reserva 1.5rem (24 píxeles CSS con la fuente raíz predeterminada) entre las entradas y la barra de desplazamiento. Chromium/WebKit usan una barra de 4px cuando existe soporte; otros navegadores conservan la barra fina nativa. La pista transparente y el indicador translúcido siguen el tema, y el modo de alto contraste mantiene los controles nativos.
+
+En 0.0.29, Anterior, Siguiente y Volver arriba quedan dentro de la tarjeta Markdown, después del contenido, con 8px de espacio en el flujo normal para no cubrir texto, tablas ni código. Los botones con iconos siguen el aspecto compacto de copiar, descargar y pantalla completa, con 36px en escritorio y controles táctiles preservados en móvil. Configura `site.documentNavigation.position` como `left`, `center` o `right`; el valor predeterminado es `center`. Los botones de los límites siguen deshabilitados, y `site.backToTop.enabled` y `minPageHeightViewports` todavía controlan la aparición de Volver arriba.
+
+El icono predeterminado del modo de enfoque es `LuScanEye`, distinto del icono de pantalla completa. Las opciones explícitas de icono o texto siguen disponibles en `site.icons.FocusMode`. Se conservan el foco por teclado, la preferencia de movimiento reducido, las traducciones y las reglas de acceso al contenido. Al cambiar la configuración, comprueba las tres alineaciones, el último párrafo y los límites de navegación en escritorio y móvil.
